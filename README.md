@@ -1,5 +1,9 @@
 # Super Resolution
 
+## Dataset
+
+https://data.vision.ee.ethz.ch/cvl/DIV2K/
+
 ## Data
 
 A python script `./preprocessing/scale.py` is made for scaling up or down images.
@@ -32,3 +36,4 @@ python scale.py --mode down -i D:\Downloads\DIV2K_valid_HR -o resized -f 20
 
 # add --interpolate if you want to scale with interpolation (smoother)
 ```
+
