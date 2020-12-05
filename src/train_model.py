@@ -6,7 +6,7 @@ from PIL import Image
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 
-from src.VDSR import VDSR
+from VDSR import VDSR
 
 training_target_dir = "./DIV2K_train_HR_crop_600"
 training_input_dir = "./DIV2K_train_LR_600_150"
@@ -35,7 +35,7 @@ def get_training_data(index_start: int = 1, index_end: int = 800):
 def get_validation_data(index_start: int = 801, index_end: int = 900):
     validation_input = []
     validation_output = []
-    for i in tqdm(range(index_start, index_end + 1)):
+    for i in range(index_start, index_end + 1):
         ipt = Image.open(validation_input_dir + "/{:04d}.png".format(i))
         opt = Image.open(validation_target_dir + "/{:04d}.png".format(i))
         validation_input.append(np.stack([np.array(ipt)[:, :, i] for i in range(3)]))
@@ -63,30 +63,31 @@ if __name__ == "__main__":
     # For 4Gb GPUs, the batch size is recommended to be set to 5.
     # For 8Gb GPUs, the batch size is recommended to be set to 10.
     # For 16Gb GPUs, the batch size is recommended to be set to 40.
-    batch_size = 10
+    batch_size = 5
     optimizer = optim.SGD(model.parameters(), lr=0.001)
     training_loss = []
     validation_loss = []
 
-    for i in tqdm(range(10)):
+    for i in tqdm(range(100)):
         j = 1
-        while j < 800:
+        while j < 500:
             training_input, training_target = get_training_data(j, j + batch_size - 1)
             # in your training loop:
             optimizer.zero_grad()  # zero the gradient buffers
             training_output = model(training_input)
-            train_loss = F.mse_loss(training_output, training_target)
+            train_loss = (training_output - training_target).pow(2).sum()
             train_loss.backward()
             optimizer.step()
-            del training_input, training_target
             training_loss.append(train_loss.item())
+            del training_input, training_target, training_output, train_loss
             torch.cuda.empty_cache()
             j += batch_size
+        optimizer.zero_grad()
         validation_input, validation_output = get_validation_data()
         valid_opt = model(validation_input)
-        valid_loss = F.mse_loss(valid_opt, validation_output)
+        valid_loss = (valid_opt - validation_output).pow(2).sum()
         validation_loss.append(valid_loss.item())
-        del validation_input, validation_output
+        del validation_input, validation_output, valid_opt, valid_loss
         torch.cuda.empty_cache()
 
     torch.save(model.state_dict(), model_dir)
