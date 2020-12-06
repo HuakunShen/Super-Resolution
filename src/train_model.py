@@ -96,7 +96,7 @@ if __name__ == "__main__":
             pbar.update(1)
 
     torch.save(model.state_dict(), model_dir)
-    validation_loss = np.array(validation_loss)
+    validation_loss = np.array(validation_loss[1:])
     training_loss = np.array(training_loss)
     plt.figure(figsize=(8, 6))
     plt.plot(np.arange(validation_loss.shape[0]), validation_loss, label="Validation")
