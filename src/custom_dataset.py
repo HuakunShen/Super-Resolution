@@ -121,4 +121,4 @@ if __name__ == "__main__":
 
     # DIV2K Dataset Demo
     dataset = DIV2K_Dataset(
-        '../datasets/DIV2K/DIV2K_train_LR_x8', '../datasets/DIV2K/DIV2K_train_HR')
+        './datasets/DIV2K/DIV2K_train_LR_x8', './datasets/DIV2K/DIV2K_train_HR')
