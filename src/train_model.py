@@ -13,6 +13,7 @@ from tqdm import tqdm
 
 from DRRN import DRRN
 from VDSR import VDSR
+from SRGAN import Generator as SRResnet
 
 training_target_dir = "/home/hacker/Documents/Super-Resolution/datasets/DIV2K/custom/64x4/hr_train"
 training_input_dir = "/home/hacker/Documents/Super-Resolution/datasets/DIV2K/custom/64x4/lr_train"
@@ -126,7 +127,7 @@ if __name__ == "__main__":
         tqdm.write('Running on CPU.')
 
     validation_input, validation_output = get_validation_data()
-    models = [DRRN, VDSR]
+    models = [DRRN, VDSR, SRResnet]
     for i in models:
         model, train, valid = train_model(i)
         plot_performance(train, valid, i.__name__)
