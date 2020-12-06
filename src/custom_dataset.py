@@ -67,6 +67,36 @@ class DIV2K_Dataset(Dataset):
         return input_img, target_img
 
 
+class DIV2K_Square_Dataset(Dataset):
+    def __init__(self, input_dir: str, target_dir: str, transform=ToTensor()) -> None:
+        # verify data integrity
+        input_files, target_files = os.listdir(
+            input_dir), os.listdir(target_dir)
+        self.lr_filenames = sorted(input_files)
+        self.hr_filenames = sorted(target_files)
+        self.filenames = self.hr_filenames
+        self.transform = transform
+        self.input_dir = os.path.abspath(input_dir)
+        self.target_dir = os.path.abspath(target_dir)
+
+    def __len__(self) -> int:
+        return len(self.filenames)
+
+    def __getitem__(self, index):
+        """
+        :param index:
+        :return: a input image (low resolution) and a target image (high resolution)
+        """
+        input_img = Image.open(os.path.join(
+            self.input_dir, self.lr_filenames[index]))
+        target_img = Image.open(os.path.join(
+            self. target_dir, self.hr_filenames[index]))
+        if self.transform:
+            input_img = self.transform(input_img)
+            target_img = self.transform(target_img)
+        return input_img, target_img
+
+
 if __name__ == "__main__":
     # BSDS Dataset Demo
     # verify dimension
