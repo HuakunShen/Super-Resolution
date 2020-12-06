@@ -5,6 +5,7 @@ import torch.optim as optim
 from PIL import Image
 from matplotlib import pyplot as plt
 from tqdm import tqdm
+import sys
 
 from VDSR import VDSR
 
@@ -56,6 +57,7 @@ if __name__ == "__main__":
         tqdm.write(f'Running on GPU: {torch.cuda.get_device_name()}.')
     else:
         tqdm.write('Running on CPU.')
+    validation_input, validation_output = get_validation_data()
 
     # TODO: Specify the model to train
     model = VDSR()
@@ -64,43 +66,52 @@ if __name__ == "__main__":
     # For 8Gb GPUs, the batch size is recommended to be set to 10.
     # For 16Gb GPUs, the batch size is recommended to be set to 40.
     batch_size = 5
-    optimizer = optim.SGD(model.parameters(), lr=0.001)
+    num_epochs = 50
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
     training_loss = []
-    validation_loss = []
+    validation_loss = [np.nan]
 
-    for i in tqdm(range(100)):
-        j = 1
-        while j < 500:
-            training_input, training_target = get_training_data(j, j + batch_size - 1)
-            # in your training loop:
-            optimizer.zero_grad()  # zero the gradient buffers
-            training_output = model(training_input)
-            train_loss = (training_output - training_target).pow(2).sum()
-            train_loss.backward()
-            optimizer.step()
-            training_loss.append(train_loss.item())
-            del training_input, training_target, training_output, train_loss
+    with tqdm(range(num_epochs), total=num_epochs, file=sys.stdout) as pbar:
+        for i in pbar:
+            j = 1
+            while j < 800:
+                training_input, training_target = get_training_data(j, j + batch_size - 1)
+                # in your training loop:
+                optimizer.zero_grad()  # zero the gradient buffers
+                training_output = model(training_input)
+                train_loss = F.mse_loss(training_output, training_target)
+                train_loss.backward()
+                optimizer.step()
+                training_loss.append(train_loss.item())
+                del training_input, training_target, training_output, train_loss
+                torch.cuda.empty_cache()
+                j += batch_size
+                pbar.set_postfix(training_loss=training_loss[-1],
+                                 validation_loss=validation_loss[-1])
+            valid_opt = model(validation_input)
+            valid_loss = F.mse_loss(valid_opt, validation_output)
+            validation_loss.append(valid_loss.item())
+            del valid_loss, valid_opt
             torch.cuda.empty_cache()
-            j += batch_size
-        optimizer.zero_grad()
-        validation_input, validation_output = get_validation_data()
-        valid_opt = model(validation_input)
-        valid_loss = (valid_opt - validation_output).pow(2).sum()
-        validation_loss.append(valid_loss.item())
-        del validation_input, validation_output, valid_opt, valid_loss
-        torch.cuda.empty_cache()
+            pbar.update(1)
 
     torch.save(model.state_dict(), model_dir)
     validation_loss = np.array(validation_loss)
     training_loss = np.array(training_loss)
+    plt.figure(figsize=(8, 6))
     plt.plot(np.arange(validation_loss.shape[0]), validation_loss, label="Validation")
     plt.plot(np.arange(training_loss.shape[0]), training_loss, label="Training")
     plt.legend()
     plt.savefig("Training losses.png")
-    plt.figure(figsize=(10, 100))
+    plt.figure(figsize=(30, 100))
+    with torch.no_grad():
+        interpolated = F.interpolate(validation_input[:10], scale_factor=4).detach().cpu().numpy()
+        valid_opt = model(validation_input)
     for i in range(10):
-        plt.subplot(10, 2, 2 * i + 1)
-        plt.imshow(np.stack(valid_opt.detach().cpu().numpy()[i, :, :, :], axis=2).astype(np.uint8))
-        plt.subplot(10, 2, 2 * i + 2)
-        plt.imshow(np.stack(validation_output.detach().cpu().numpy()[i, :, :, :], axis=2).astype(np.uint8))
+        plt.subplot(10, 3, 3 * i + 1)
+        plt.imshow(np.stack(interpolated[i, :, :, :].astype(np.uint8), axis=2))
+        plt.subplot(10, 3, 3 * i + 2)
+        plt.imshow(np.stack(valid_opt.detach().cpu().numpy()[i, :, :, :].astype(np.uint8), axis=2))
+        plt.subplot(10, 3, 3 * i + 3)
+        plt.imshow(np.stack(validation_output.detach().cpu().numpy()[i, :, :, :].astype(np.uint8), axis=2))
     plt.savefig("result.png")
