@@ -61,7 +61,7 @@ def train_model(mod: nn.Module, batch_size: int = 40, num_epochs: int = 50,
     with tqdm(range(num_epochs), total=num_epochs, file=sys.stdout) as pbar:
         for i in pbar:
             j = 1
-            while j < 2400:
+            while j < len(os.listdir(training_input_dir)):
                 training_input, training_target = get_training_data(j, j + batch_size - 1)
                 # in your training loop:
                 optimizer.zero_grad()  # zero the gradient buffers
