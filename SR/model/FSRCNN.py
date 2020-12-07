@@ -3,9 +3,9 @@ from torch import nn
 import torch
 
 
-class FSRCNN(nn.Module):
+class FSRCNN_Original(nn.Module):
     def __init__(self, scale_factor, num_channels=1, d=56, s=12, m=4):
-        super(FSRCNN, self).__init__()
+        super(FSRCNN_Original, self).__init__()
         self.first_part = nn.Sequential(
             nn.Conv2d(num_channels, d, kernel_size=5, padding=5 // 2),
             nn.PReLU(d)
@@ -40,3 +40,40 @@ class FSRCNN(nn.Module):
         x = self.mid_part(x)
         x = self.last_part(x)
         return x
+
+
+class FSRCNN(nn.Module):
+    def __init__(self, factor: int) -> None:
+        super(FSRCNN, self).__init__()
+        tmp = []
+        for _ in range(4):
+            tmp.append(nn.Conv2d(16, 16, kernel_size=3, padding=1))
+            tmp.append(nn.PReLU(16))
+
+        self.body = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=5, padding=2),
+            nn.PReLU(64),
+            nn.Conv2d(64, 16, kernel_size=1),
+            nn.PReLU(16),
+            *tmp,
+            nn.Conv2d(16, 64, kernel_size=1),
+            nn.PReLU(64),
+            nn.ConvTranspose2d(64, 3, kernel_size=9, stride=factor, padding=4,
+                               output_padding=factor - 1)
+        )
+        self._init_weights()
+
+    def _init_weights(self):
+        for layer in self.body:
+            if isinstance(layer, nn.Conv2d):
+                nn.init.normal_(layer.weight.data, mean=0.0, std=0.01)
+                nn.init.zeros_(layer.bias.data)
+
+    def forward(self, inputs):
+        return self.body(inputs)
+
+
+if __name__ == "__main__":
+    model = FSRCNN(3)
+    img = torch.rand((1, 3, 150, 150))
+    print(model(img).shape)

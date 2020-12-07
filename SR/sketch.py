@@ -13,4 +13,6 @@ if __name__ == '__main__':
             axes[row][col].set_title('hello')
             axes[row][col].axis('off')
             axes[row][col].imshow(images[row])
+
     fig.savefig('/home/hacker/Desktop/test_image.png')
+    plt.close()

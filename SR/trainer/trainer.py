@@ -5,6 +5,7 @@ from torchvision.utils import make_grid
 from torchvision import transforms
 from trainer.base_trainer import BaseTrainer
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 class Trainer(BaseTrainer):
@@ -35,7 +36,7 @@ class Trainer(BaseTrainer):
         total_loss = 0.0
         for batch_idx, (data, target) in enumerate(self.train_dataloader):
             inputs, labels = data.to(self.device), target.to(self.device)
-        #     del data, target
+            #     del data, target
             self.optimizer.zero_grad()
             output = self.model(inputs)
 
@@ -49,7 +50,7 @@ class Trainer(BaseTrainer):
                                           val_L=(self.valid_loss[-1].item() if len(self.valid_loss) != 0 else None))
         #     del inputs, labels, loss, output
         #     torch.cuda.empty_cache()
-        # self.train_loss.append(total_loss / len(self.train_dataset))
+        self.train_loss.append(total_loss / len(self.train_dataset))
 
         # do validation
         valid_loss = self._valid_epoch(epoch) if self.do_validation else None
@@ -110,4 +111,7 @@ class Trainer(BaseTrainer):
                 axes[i][1].imshow(output_images[i])
                 axes[i][2].imshow(target_images[i])
             fig.savefig(output_path)
+            plt.close()
             del data, target, input_images, output_images, target_images
+        np.savetxt(self.checkpoint_dir / 'valid_loss.txt', self.valid_loss)
+        np.savetxt(self.checkpoint_dir / 'train_loss.txt', self.train_loss)

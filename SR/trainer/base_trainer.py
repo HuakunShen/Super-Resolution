@@ -89,6 +89,7 @@ class BaseTrainer:
             plt.ylabel("loss")
             plt.title("Training Loss")
             plt.savefig(self.checkpoint_dir / 'train_loss.png')
+            plt.close()
         else:
             print("error: no training loss")
         if len(self.valid_loss) != 0:
@@ -98,6 +99,7 @@ class BaseTrainer:
             plt.ylabel("loss")
             plt.title("Validation Loss")
             plt.savefig(self.checkpoint_dir / 'valid_loss.png')
+            plt.close()
         else:
             print("error: no validation loss")
 
