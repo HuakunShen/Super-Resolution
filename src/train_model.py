@@ -129,7 +129,7 @@ if __name__ == "__main__":
     validation_input, validation_output = get_validation_data()
     models = [DRRN, VDSR, SRResnet]
     for i in models:
-        model, train, valid = train_model(i)
+        model, train, valid = train_model(i, num_epochs=25, batch_size=10)
         plot_performance(train, valid, i.__name__)
         plot_predictions(model, validation_input, validation_output)
         del model
