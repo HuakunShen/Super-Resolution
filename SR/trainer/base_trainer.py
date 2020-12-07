@@ -47,7 +47,8 @@ class BaseTrainer:
             # with tqdm(range(self.start_epoch, self.epochs + 1), total=self.epochs, file=sys.stdout) as progress_bar:
             self.progress_bar = progress_bar
             for epoch in range(self.start_epoch, self.epochs + 1):
-                self.progress_bar.set_description('epoch: {}/{}'.format(epoch, self.epochs))
+                self.progress_bar.set_description(
+                    'epoch: {}/{}'.format(epoch, self.epochs))
                 result = self._train_epoch(epoch)
                 # valid_loss = result['valid_loss']
                 # evaluate model performance according to configured metric, save best checkpoint as model_best
@@ -78,10 +79,12 @@ class BaseTrainer:
 
                 if epoch % self.save_period == 0 or epoch == self.epochs:
                     self._save_checkpoint(epoch)
+                    pass
 
         # training loss plot
         if len(self.train_loss) != 0:
-            plt.plot(range(1, len(self.train_loss)), self.train_loss)
+            plt.figure()
+            plt.plot(list(range(1, len(self.train_loss) + 1)), self.train_loss)
             plt.xlabel("epoch")
             plt.ylabel("loss")
             plt.title("Training Loss")
@@ -89,7 +92,8 @@ class BaseTrainer:
         else:
             print("error: no training loss")
         if len(self.valid_loss) != 0:
-            plt.plot(range(1, len(self.valid_loss)), self.valid_loss)
+            plt.figure()
+            plt.plot(list(range(1, len(self.valid_loss) + 1)), self.valid_loss)
             plt.xlabel("epoch")
             plt.ylabel("loss")
             plt.title("Validation Loss")
@@ -98,4 +102,5 @@ class BaseTrainer:
             print("error: no validation loss")
 
     def _save_checkpoint(self, epoch):
-        torch.save(self.model.state_dict(), os.path.join(self.model_weights_dir, 'epoch{}.pth'.format(epoch)))
+        torch.save(self.model.state_dict(), os.path.join(
+            self.model_weights_dir, 'epoch{}.pth'.format(epoch)))

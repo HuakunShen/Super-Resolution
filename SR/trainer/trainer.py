@@ -13,14 +13,16 @@ class Trainer(BaseTrainer):
                  train_dataloader=None,
                  valid_dataloader=None,
                  lr_scheduler=None):
-        super(Trainer, self).__init__(model, criterion, optimizer, train_dataset, valid_dataset, config)
+        super(Trainer, self).__init__(model, criterion,
+                                      optimizer, train_dataset, valid_dataset, config)
         self.config = config
         self.device = device
         self.train_dataloader = train_dataloader
         self.valid_dataloader = valid_dataloader
         self.lr_scheduler = lr_scheduler
         self.do_validation = self.valid_dataloader is not None
-        self.len_epoch = len(self.train_dataloader)  # number of batches in dataloader
+        # number of batches in dataloader
+        self.len_epoch = len(self.train_dataloader)
         self.log_step = config['log_step']
 
     def _train_epoch(self, epoch):
@@ -32,30 +34,29 @@ class Trainer(BaseTrainer):
         self.model.train()
         total_loss = 0.0
         for batch_idx, (data, target) in enumerate(self.train_dataloader):
-            data, target = data.to(self.device), target.to(self.device)
+            inputs, labels = data.to(self.device), target.to(self.device)
+        #     del data, target
             self.optimizer.zero_grad()
-            output = self.model(data)
-            loss = self.criterion(output, target)
+            output = self.model(inputs)
+
+            loss = self.criterion(output, labels)
             total_loss += loss
             loss.backward()
+
             self.optimizer.step()
-            # if batch_idx % self.log_step == 0:
-            # self.train_loss.append(loss.item())
-            self.progress_bar.update(len(data))
+            self.progress_bar.update(len(inputs))
             self.progress_bar.set_postfix(train_L=loss.item(),
                                           val_L=(self.valid_loss[-1].item() if len(self.valid_loss) != 0 else None))
-            del data, target, loss, output
-        self.train_loss.append(total_loss / len(self.train_dataset))
+        #     del inputs, labels, loss, output
+        #     torch.cuda.empty_cache()
+        # self.train_loss.append(total_loss / len(self.train_dataset))
 
         # do validation
         valid_loss = self._valid_epoch(epoch) if self.do_validation else None
         self.valid_loss.append(valid_loss)
         if self.lr_scheduler is not None:
             self.lr_scheduler.step()
-
-        return {
-            'valid_loss': valid_loss
-        }
+        return {'valid_loss': valid_loss}
 
     def _valid_epoch(self, epoch):
         """
@@ -67,11 +68,12 @@ class Trainer(BaseTrainer):
         total_loss = 0.0
         with torch.no_grad():
             for batch_idx, (data, target) in enumerate(self.valid_dataloader):
-                data, target = data.to(self.device), target.to(self.device)
-                output = self.model(data)
-                loss = self.criterion(output, target)
-                del data, target, output, loss
+                inputs, labels = data.to(self.device), target.to(self.device)
+                del data, target
+                output = self.model(inputs)
+                loss = self.criterion(output, labels)
                 total_loss += loss
+                del inputs, labels, output, loss
         return total_loss / len(self.valid_dataset)
 
     def _progress(self, batch_idx):
@@ -98,10 +100,12 @@ class Trainer(BaseTrainer):
             input_images = [transforms.ToPILImage()(img) for img in data]
             output_images = [transforms.ToPILImage()(img) for img in output]
             target_images = [transforms.ToPILImage()(img) for img in target]
-
-            fig, axes = plt.subplots(nrows=len(input_images), ncols=3)
+            plot_height = self.valid_dataloader.batch_size * 10
+            fig, axes = plt.subplots(
+                nrows=len(input_images), ncols=3, figsize=(30, plot_height))
             for i in range(len(input_images)):
-                interpolate_img = input_images[i].resize(target.shape[-2:], resample=PIL.Image.BICUBIC)
+                interpolate_img = input_images[i].resize(
+                    target.shape[-2:], resample=PIL.Image.BICUBIC)
                 axes[i][0].imshow(interpolate_img)
                 axes[i][1].imshow(output_images[i])
                 axes[i][2].imshow(target_images[i])

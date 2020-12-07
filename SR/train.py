@@ -14,23 +14,27 @@ from model.resnet_sr import ResNetPretrainedSS, ResNetPretrainedDS, ResNetPretra
 
 # %%
 # setup Dataset
-DIV2K_path = pathlib.Path('/home/hacker/Documents/Super-Resolution/datasets/DIV2K').absolute()
-train_in_dir, train_label_dir = DIV2K_path / 'diff' / 'train_200', DIV2K_path / 'diff' / 'train_600'
-test_in_dir, test_label_dir = DIV2K_path / 'diff' / 'valid_200', DIV2K_path / 'diff' / 'valid_600'
+DIV2K_path = pathlib.Path(
+    '/home/hacker/Documents/Super-Resolution/datasets/DIV2K').absolute()
+train_in_dir, train_label_dir = DIV2K_path / 'diff' / \
+    'train_200', DIV2K_path / 'diff' / 'train_600'
+test_in_dir, test_label_dir = DIV2K_path / 'diff' / \
+    'valid_200', DIV2K_path / 'diff' / 'valid_600'
 DS = DIV2K_Square_Dataset
 
 # %% constants and parameters
 train_set_percentage = 0.8
 config = {
-    'epochs': 2,
-    'save_period': 1,
-    'batch_size': 4,
+    'epochs': 25,
+    'save_period': 5,
+    'batch_size': 20,
     'checkpoint_dir': '/home/hacker/Documents/Super-Resolution/SR/result/FSRCNN',
     'log_step': 10,
     'start_epoch': 1
 }
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-model = FSRCNN(scale_factor=3, num_channels=3).to(device)  # pass in 600x600 for this model
+model = FSRCNN(scale_factor=3, num_channels=3).to(
+    device)  # pass in 600x600 for this model
 criterion = nn.MSELoss()
 # optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 optimizer = optim.Adam([
@@ -42,14 +46,21 @@ optimizer = optim.Adam([
 lr_scheduler = None
 
 # %%
-dataset = DS(input_dir=train_in_dir, target_dir=train_label_dir, transform=transforms.ToTensor())
+dataset = DS(input_dir=train_in_dir, target_dir=train_label_dir,
+             transform=transforms.ToTensor())
 num_train = int(train_set_percentage * len(dataset))
 num_valid = int(len(dataset) - num_train)
-train_set, valid_set = torch.utils.data.random_split(dataset, [num_train, num_valid])
-train_loader = DataLoader(dataset=train_set, batch_size=config['batch_size'], shuffle=True)
-valid_loader = DataLoader(dataset=valid_set, batch_size=config['batch_size'], shuffle=True)
+train_set, valid_set = torch.utils.data.random_split(
+    dataset, [num_train, num_valid])
+train_loader = DataLoader(
+    dataset=train_set, batch_size=config['batch_size'], shuffle=True)
+valid_loader = DataLoader(
+    dataset=valid_set, batch_size=config['batch_size'], shuffle=True)
 
 # %%
+device_name = torch.cuda.get_device_name(
+    device) if device.type != 'cpu' else 'cpu'
+print(f"Running on {device_name}")
 trainer = Trainer(model=model,
                   criterion=criterion,
                   optimizer=optimizer,
