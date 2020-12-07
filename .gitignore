@@ -140,3 +140,4 @@ dmypy.json
 *.png
 
 test/transfer_learning
+pytorch-template/
