@@ -37,14 +37,14 @@ class Trainer(BaseTrainer):
         for batch_idx, (data, target) in enumerate(self.train_dataloader):
             inputs, labels = data.to(self.device), target.to(self.device)
             #     del data, target
-            self.optimizer.zero_grad()
             output = self.model(inputs)
 
             loss = self.criterion(output, labels)
             total_loss += loss
+            self.optimizer.zero_grad()
             loss.backward()
-
             self.optimizer.step()
+            # update progress bar
             self.progress_bar.update(len(inputs))
             self.progress_bar.set_postfix(train_L=loss.item(),
                                           val_L=(self.valid_loss[-1].item() if len(self.valid_loss) != 0 else None))

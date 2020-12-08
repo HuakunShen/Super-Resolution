@@ -4,6 +4,28 @@ import torch
 
 
 class FSRCNN_Original(nn.Module):
+    """
+    fsrcnn_original = FSRCNN_Original(scale_factor=3, num_channels=3).to(device)
+    cnn_original_config = {
+        'epochs': 20,
+        'save_period': 5,
+        'batch_size': 16,
+        'checkpoint_dir': SR_path/'result/FSRCNN-50-150-original',
+        'log_step': 10,
+        'start_epoch': 1,
+        'criterion': nn.MSELoss(),
+        'DATASET_TYPE': 'diff',
+        'low_res': 100,
+        'high_res': 300,
+        'learning_rate': 1e-3
+    }
+    optimizer = optim.Adam([
+        {'params': model.first_part.parameters()},
+        {'params': model.mid_part.parameters()},
+        {'params': model.last_part.parameters(), 'lr': config['learning_rate'] * 0.1}
+    ], lr=config['learning_rate'])
+    """
+
     def __init__(self, scale_factor, num_channels=1, d=56, s=12, m=4):
         super(FSRCNN_Original, self).__init__()
         self.first_part = nn.Sequential(
@@ -47,18 +69,18 @@ class FSRCNN(nn.Module):
         super(FSRCNN, self).__init__()
         tmp = []
         for _ in range(4):
-            tmp.append(nn.Conv2d(16, 16, kernel_size=3, padding=1))
-            tmp.append(nn.PReLU(16))
+            tmp.append(nn.Conv2d(12, 12, kernel_size=3, padding=1))
+            tmp.append(nn.PReLU(12))
 
         self.body = nn.Sequential(
-            nn.Conv2d(3, 64, kernel_size=5, padding=2),
-            nn.PReLU(64),
-            nn.Conv2d(64, 16, kernel_size=1),
-            nn.PReLU(16),
+            nn.Conv2d(3, 56, kernel_size=5, padding=2),
+            nn.PReLU(56),
+            nn.Conv2d(56, 12, kernel_size=1),
+            nn.PReLU(12),
             *tmp,
-            nn.Conv2d(16, 64, kernel_size=1),
-            nn.PReLU(64),
-            nn.ConvTranspose2d(64, 3, kernel_size=9, stride=factor, padding=4,
+            nn.Conv2d(12, 56, kernel_size=1),
+            nn.PReLU(56),
+            nn.ConvTranspose2d(56, 3, kernel_size=9, stride=factor, padding=4,
                                output_padding=factor - 1)
         )
         self._init_weights()

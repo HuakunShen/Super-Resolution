@@ -7,6 +7,7 @@ from numpy import inf
 from tqdm import tqdm
 from abc import abstractmethod
 import matplotlib.pyplot as plt
+import test_all
 
 
 class BaseTrainer:
@@ -50,37 +51,14 @@ class BaseTrainer:
                 self.progress_bar.set_description(
                     'epoch: {}/{}'.format(epoch, self.epochs))
                 result = self._train_epoch(epoch)
-                # valid_loss = result['valid_loss']
-                # evaluate model performance according to configured metric, save best checkpoint as model_best
-                # TODO: implement the function to early stop if model not improved over certain epochs
-                # best = False
-                # if self.mnt_mode != 'off':
-                #     try:
-                #         # check whether model performance improved or not, according to specified metric(mnt_metric)
-                #         improved = (self.mnt_mode == 'min' and log[self.mnt_metric] <= self.mnt_best) or \
-                #                    (self.mnt_mode == 'max' and log[self.mnt_metric] >= self.mnt_best)
-                #     except KeyError:
-                #         self.logger.warning("Warning: Metric '{}' is not found. "
-                #                             "Model performance monitoring is disabled.".format(self.mnt_metric))
-                #         self.mnt_mode = 'off'
-                #         improved = False
-                #
-                #     if improved:
-                #         self.mnt_best = log[self.mnt_metric]
-                #         not_improved_count = 0
-                #         best = True
-                #     else:
-                #         not_improved_count += 1
-                #
-                #     if not_improved_count > self.early_stop:
-                #         self.logger.info("Validation performance didn\'t improve for {} epochs. "
-                #                          "Training stops.".format(self.early_stop))
-                #         break
-
                 if epoch % self.save_period == 0 or epoch == self.epochs:
                     self._save_checkpoint(epoch)
-                    pass
 
+        self.progress_bar.close()
+
+    def _save_checkpoint(self, epoch):
+        torch.save(self.model.state_dict(), os.path.join(
+            self.model_weights_dir, 'epoch{}.pth'.format(epoch)))
         # training loss plot
         if len(self.train_loss) != 0:
             plt.figure()
@@ -102,7 +80,3 @@ class BaseTrainer:
             plt.close()
         else:
             print("error: no validation loss")
-
-    def _save_checkpoint(self, epoch):
-        torch.save(self.model.state_dict(), os.path.join(
-            self.model_weights_dir, 'epoch{}.pth'.format(epoch)))
