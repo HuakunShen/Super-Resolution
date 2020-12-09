@@ -7,6 +7,7 @@ from math import ceil
 from torchvision import transforms
 from PIL import Image
 
+
 def double_conv(in_c, out_c):
     return nn.Sequential(
         nn.Conv2d(in_c, out_c, kernel_size=3),
