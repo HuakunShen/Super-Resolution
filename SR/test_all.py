@@ -10,16 +10,19 @@ import multiprocessing
 import matplotlib.pyplot as plt
 from torchvision import transforms
 from model.FSRCNN import FSRCNN, FSRCNN_Original
-
+from model.SRCNN import SRCNN
+from model.UNetSR import UNetSR
 
 """
 Example:
 python3 test_all.py --model FSRCNN -t diff --low 200 --high 600 -w /home/hacker/Documents/Super-Resolution/SR/result/FSRCNN_new/weights/epoch25.pth -o /home/hacker/Documents/Super-Resolution/SR/result/FSRCNN_new/test
 """
 
-model_class_map = {
+model_map = {
     'FSRCNN': FSRCNN(factor=3),
-    'FSRCNN_Original': FSRCNN_Original(scale_factor=3, num_channels=3)
+    'FSRCNN_Original': FSRCNN_Original(scale_factor=3, num_channels=3),
+    'SRCNN': SRCNN(in_channel=3),
+    'UNetSR': UNetSR(in_c=3, out_c=3)
 }
 
 
@@ -48,12 +51,22 @@ class Saver():
         lr_image.close()
         hr_image.close()
         fig.savefig(self.output_path/f"test-{image_name}.png")
+        plt.close()
 
 
 def main(type_, lr_size, hr_size, weight_path, output_path, model_name):
+    print(f"""
+    running test all with
+    type: {type_}
+    lr_size: {lr_size}
+    hr_size: {hr_size}
+    weight_path: {weight_path}
+    output_path: {output_path}
+    model_name: {model_name}
+    """)
     weight_path = pathlib.Path(weight_path)
     output_path = pathlib.Path(output_path)
-    model = model_class_map[model_name]
+    model = model_map[model_name]
     if output_path.exists():
         shutil.rmtree(output_path)
     output_path.mkdir(parents=True, exist_ok=False)
@@ -68,11 +81,14 @@ def main(type_, lr_size, hr_size, weight_path, output_path, model_name):
     model.eval()
     image_names = os.listdir(valid_lr)
 
-    with multiprocessing.Pool(multiprocessing.cpu_count()) as p:
-        with tqdm(total=len(image_names)) as pbar:
-            for i, y in enumerate(p.imap_unordered(Saver(output_path, valid_lr, valid_hr,
-                                                         model), image_names)):
-                pbar.update()
+    for image_name in tqdm(image_names):
+        Saver(output_path, valid_lr, valid_hr, model)(image_name)
+
+    # with multiprocessing.Pool(multiprocessing.cpu_count()) as p:
+    #     with tqdm(total=len(image_names)) as pbar:
+    #         for i, y in enumerate(p.imap_unordered(Saver(output_path, valid_lr, valid_hr,
+    #                                                      model), image_names)):
+    #             pbar.update()
 
 
 if __name__ == "__main__":

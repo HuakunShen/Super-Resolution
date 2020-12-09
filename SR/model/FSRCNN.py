@@ -65,6 +65,22 @@ class FSRCNN_Original(nn.Module):
 
 
 class FSRCNN(nn.Module):
+    """
+    fsrcnn_config = {
+        'epochs': 50,
+        'save_period': 10,
+        'batch_size': 16,
+        'checkpoint_dir': SR_path/'result/FSRCNN-100-300',
+        'log_step': 10,
+        'start_epoch': 1,
+        'criterion': nn.MSELoss(),
+        'DATASET_TYPE': 'diff',
+        'low_res': 100,
+        'high_res': 300,
+        'learning_rate': 0.001
+    }
+    """
+
     def __init__(self, factor: int) -> None:
         super(FSRCNN, self).__init__()
         tmp = []

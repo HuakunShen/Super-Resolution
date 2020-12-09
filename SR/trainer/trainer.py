@@ -6,6 +6,7 @@ from torchvision import transforms
 from trainer.base_trainer import BaseTrainer
 import matplotlib.pyplot as plt
 import numpy as np
+from utils.util import get_lr
 
 
 class Trainer(BaseTrainer):
@@ -35,21 +36,20 @@ class Trainer(BaseTrainer):
         self.model.train()
         total_loss = 0.0
         for batch_idx, (data, target) in enumerate(self.train_dataloader):
-            inputs, labels = data.to(self.device), target.to(self.device)
-            #     del data, target
-            output = self.model(inputs)
-
-            loss = self.criterion(output, labels)
-            total_loss += loss
+            data, target = data.to(self.device), target.to(self.device)
+            output = self.model(data)
+            loss = self.criterion(output, target)
             self.optimizer.zero_grad()
             loss.backward()
             self.optimizer.step()
+            total_loss += loss.item()
             # update progress bar
-            self.progress_bar.update(len(inputs))
+            self.progress_bar.update(len(data))
             self.progress_bar.set_postfix(train_L=loss.item(),
-                                          val_L=(self.valid_loss[-1].item() if len(self.valid_loss) != 0 else None))
-        #     del inputs, labels, loss, output
-        #     torch.cuda.empty_cache()
+                                          val_L=(
+                                              self.valid_loss[-1].item() if len(self.valid_loss) != 0 else None),
+                                          lr=get_lr(self.optimizer))
+            del data, target, loss
         self.train_loss.append(total_loss / len(self.train_dataset))
 
         # do validation
@@ -69,12 +69,11 @@ class Trainer(BaseTrainer):
         total_loss = 0.0
         with torch.no_grad():
             for batch_idx, (data, target) in enumerate(self.valid_dataloader):
-                inputs, labels = data.to(self.device), target.to(self.device)
-                del data, target
-                output = self.model(inputs)
-                loss = self.criterion(output, labels)
+                data, target = data.to(self.device), target.to(self.device)
+                output = self.model(data)
+                loss = self.criterion(output, target)
                 total_loss += loss
-                del inputs, labels, output, loss
+                del data, target, output, loss
         return total_loss / len(self.valid_dataset)
 
     def _progress(self, batch_idx):
@@ -101,9 +100,9 @@ class Trainer(BaseTrainer):
             input_images = [transforms.ToPILImage()(img) for img in data]
             output_images = [transforms.ToPILImage()(img) for img in output]
             target_images = [transforms.ToPILImage()(img) for img in target]
-            plot_height = self.valid_dataloader.batch_size * 10
+            plot_height = self.valid_dataloader.batch_size * 10 * 2 // 3
             fig, axes = plt.subplots(
-                nrows=len(input_images), ncols=3, figsize=(30, plot_height))
+                nrows=len(input_images), ncols=3, figsize=(20, plot_height))
             for i in range(len(input_images)):
                 interpolate_img = input_images[i].resize(
                     target.shape[-2:], resample=PIL.Image.BICUBIC)
