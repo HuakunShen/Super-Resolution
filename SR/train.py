@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 import torch
 import pathlib
 import logging
@@ -69,9 +70,9 @@ if __name__ == '__main__':
 
     unetsr_config = {
         'epochs': 50,
-        'save_period': 10,
+        'save_period': 30,
         'batch_size': 10,
-        'checkpoint_dir': SR_path/'result/UNetSR-100-300-50iter-scheduler',
+        'checkpoint_dir': SR_path/'result/UNetSR-100-300-150iter',
         'log_step': 10,
         'start_epoch': 1,
         'criterion': nn.MSELoss(),
@@ -123,9 +124,11 @@ if __name__ == '__main__':
         'learning_rate': 0.005
     }
 
-    models = [srcnn, srcnn_150_300, srcnn_50_300]
-    configs = [srcnn_config,
-               srcnn_config_150_300, srcnn_config_50_300]
+    # models = [srcnn, srcnn_150_300, srcnn_50_300]
+    # configs = [srcnn_config,
+    #            srcnn_config_150_300, srcnn_config_50_300]
+    models = [unetsr]
+    configs = [unetsr_config]
     ###################################################################################################################
     # Above is the configuration you need to set
     ###################################################################################################################
@@ -139,6 +142,13 @@ if __name__ == '__main__':
         torch.cuda.empty_cache()
         model = models[i]
         config = configs[i]
+        ######################### setup logger ####################################################################
+        config["checkpoint_dir"].mkdir(parents=True, exist_ok=True)
+        logging.basicConfig(
+            filename=f'{config["checkpoint_dir"]/"log"}.log', level=logging.INFO, format='%(asctime)s - %(funcName)s - %(levelname)s - %(message)s')
+        logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
+        ######################### setup logger ####################################################################
+
         DATASET_TYPE = config['DATASET_TYPE']
         lr_number, hr_number = config['low_res'], config['high_res']
         train_in_dir, train_label_dir = DIV2K_path / DATASET_TYPE / \
@@ -148,15 +158,15 @@ if __name__ == '__main__':
             f'valid_{lr_number}', DIV2K_path / \
             DATASET_TYPE / f'valid_{hr_number}'
         # log training dataset info
-        print("=" * 100)
-        print(f"training model: {model.__class__}")
-        print("Config:")
-        print(config)
-        print(f"dataset_type: {DATASET_TYPE}")
-        print(f"low resolution: {lr_number}")
-        print(f"high resolution: {hr_number}")
-        print(f"checkpoint_dir: {config['checkpoint_dir']}")
-        print("=" * 100)
+        logging.info("=" * 100)
+        logging.info(f"training model: {model.__class__}")
+        logging.info("Config:")
+        logging.info(config)
+        logging.info(f"dataset_type: {DATASET_TYPE}")
+        logging.info(f"low resolution: {lr_number}")
+        logging.info(f"high resolution: {hr_number}")
+        logging.info(f"checkpoint_dir: {config['checkpoint_dir']}")
+        logging.info("=" * 100)
         # optimizer = optim.SGD(model.parameters(), lr=0.05)
         optimizer = optim.Adam(model.parameters(), lr=config['learning_rate'])
         scheduler = lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.4)
@@ -183,8 +193,8 @@ if __name__ == '__main__':
                   valid_loader,
                   scheduler)
         except Exception as e:
-            print(e)
-            print("Failed! Skip to next model if there is any left.")
+            logging.error(e)
+            logging.error("Failed! Skip to next model if there is any left.")
             continue
         del train_set, valid_set, dataset, train_loader, valid_loader, optimizer, scheduler
 
@@ -194,8 +204,9 @@ if __name__ == '__main__':
             weight_files = sorted(os.listdir(weight_path), key=lambda filename: int(
                 re.findall('epoch(\d{1,})\.pth', filename)[0]))
             if len(weight_files) != 0:
-                print("Running tests")
+                logging.info("Running tests")
                 test_all.main(config['DATASET_TYPE'], config['low_res'],
                               config['high_res'], weight_path/weight_files[-1], config['checkpoint_dir']/'test', model.__class__.__name__)
         except KeyError as e:
-            print("Test images failed to generate. Likely your model is not registered in the test_all.py file. Modify the map dictionary called model_map")
+            logging.error(
+                "Test images failed to generate. Likely your model is not registered in the test_all.py file. Modify the map dictionary called model_map")
