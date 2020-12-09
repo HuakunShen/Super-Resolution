@@ -47,7 +47,7 @@ if __name__ == '__main__':
     if torch.cuda.is_available():
         torch.set_default_tensor_type(torch.cuda.FloatTensor)
         torch.cuda.manual_seed_all(1024)
-    SR_path = pathlib.Path(__file__).parent.parent.absolute()
+    SR_path = pathlib.Path(__file__).parent.absolute()
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     ###################################################################################################################
@@ -69,17 +69,18 @@ if __name__ == '__main__':
     unetsr = UNetSR().to(device)
 
     unetsr_config = {
-        'epochs': 50,
+        'epochs': 150,
         'save_period': 30,
         'batch_size': 10,
         'checkpoint_dir': SR_path/'result/UNetSR-100-300-150iter',
         'log_step': 10,
-        'start_epoch': 1,
+        'start_epoch': 90,
         'criterion': nn.MSELoss(),
         'DATASET_TYPE': 'same_300',
         'low_res': 100,
         'high_res': 300,
-        'learning_rate': 0.005
+        'learning_rate': 0.005,
+        'scheduler': None
     }
 
     srcnn_config = {
@@ -93,7 +94,8 @@ if __name__ == '__main__':
         'DATASET_TYPE': 'same_300',
         'low_res': 100,
         'high_res': 300,
-        'learning_rate': 0.005
+        'learning_rate': 0.005,
+        'scheduler': {'step_size': 20, 'gamma': 0.4}
     }
 
     srcnn_config_150_300 = {
@@ -107,7 +109,8 @@ if __name__ == '__main__':
         'DATASET_TYPE': 'same_300',
         'low_res': 150,
         'high_res': 300,
-        'learning_rate': 0.005
+        'learning_rate': 0.005,
+        'scheduler': {'step_size': 20, 'gamma': 0.4}
     }
 
     srcnn_config_50_300 = {
@@ -121,14 +124,31 @@ if __name__ == '__main__':
         'DATASET_TYPE': 'same_300',
         'low_res': 50,
         'high_res': 300,
-        'learning_rate': 0.005
+        'learning_rate': 0.005,
+        'scheduler': {'step_size': 20, 'gamma': 0.4}
     }
 
     # models = [srcnn, srcnn_150_300, srcnn_50_300]
     # configs = [srcnn_config,
     #            srcnn_config_150_300, srcnn_config_50_300]
-    models = [unetsr]
-    configs = [unetsr_config]
+    # models = [unetsr]
+    # configs = [unetsr_config]
+
+    models = [srcnn]
+    configs = [{
+        'epochs': 53,
+        'save_period': 1,
+        'batch_size': 2,
+        'checkpoint_dir': SR_path/'result/test',
+        'log_step': 10,
+        'start_epoch': 50,
+        'criterion': nn.MSELoss(),
+        'DATASET_TYPE': 'same_300',
+        'low_res': 100,
+        'high_res': 300,
+        'learning_rate': 0.005,
+        'scheduler': {'step_size': 20, 'gamma': 0.4}
+    }]
     ###################################################################################################################
     # Above is the configuration you need to set
     ###################################################################################################################
@@ -169,8 +189,13 @@ if __name__ == '__main__':
         logging.info("=" * 100)
         # optimizer = optim.SGD(model.parameters(), lr=0.05)
         optimizer = optim.Adam(model.parameters(), lr=config['learning_rate'])
-        scheduler = lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.4)
-        # scheduler = None
+
+        if 'scheduler' in config and config['scheduler'] is not None:
+            scheduler = lr_scheduler.StepLR(
+                optimizer, step_size=config['scheduler']['step_size'], gamma=config['scheduler']['gamma'])
+        else:
+            scheduler = None
+
         dataset = DS(input_dir=train_in_dir, target_dir=train_label_dir,
                      transform=transforms.ToTensor())
         num_train = int(train_set_percentage * len(dataset))
