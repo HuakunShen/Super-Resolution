@@ -143,3 +143,5 @@ test/transfer_learning
 pytorch-template/
 
 SR/result
+
+._.DS_Store

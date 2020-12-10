@@ -2,6 +2,7 @@ import os
 import re
 import sys
 import torch
+import shutil
 import pathlib
 import logging
 import argparse
@@ -23,6 +24,7 @@ from model.DRRN import DRRN
 from model.VDSR import VDSR
 from model.UNetSR import UNetSR
 import test_all
+from logger import get_logger
 
 
 def train(mod: nn.Module, criterion, optimizer_, device_, config_, train_dataset, valid_dataset, train_dataloader,
@@ -70,16 +72,16 @@ if __name__ == '__main__':
 
     unetsr_config = {
         'epochs': 150,
-        'save_period': 30,
+        'save_period': 5,
         'batch_size': 10,
         'checkpoint_dir': SR_path/'result/UNetSR-100-300-150iter',
         'log_step': 10,
-        'start_epoch': 90,
+        'start_epoch': 120,
         'criterion': nn.MSELoss(),
         'DATASET_TYPE': 'same_300',
         'low_res': 100,
         'high_res': 300,
-        'learning_rate': 0.005,
+        'learning_rate': 0.001,
         'scheduler': None
     }
 
@@ -128,26 +130,39 @@ if __name__ == '__main__':
         'scheduler': {'step_size': 20, 'gamma': 0.4}
     }
 
+    resnet_pretrained_ss = ResNetPretrainedSS()
+    resnet_pretrained_ss_config = {
+        'epochs': 1,
+        'save_period': 10,
+        'batch_size': 20,
+        'checkpoint_dir': SR_path/'result/resnet_pretrained_ss_50',
+        'log_step': 10,
+        'start_epoch': 1,
+        'criterion': nn.MSELoss(),
+        'DATASET_TYPE': 'same',
+        'low_res': 200,
+        'high_res': 600,
+        'learning_rate': 0.005,
+        'scheduler': {'step_size': 10, 'gamma': 0.4}
+    }
+
     # models = [srcnn, srcnn_150_300, srcnn_50_300]
     # configs = [srcnn_config,
     #            srcnn_config_150_300, srcnn_config_50_300]
-    # models = [unetsr]
-    # configs = [unetsr_config]
-
-    models = [srcnn]
-    configs = [{
-        'epochs': 53,
-        'save_period': 1,
-        'batch_size': 2,
-        'checkpoint_dir': SR_path/'result/test',
+    models = [resnet_pretrained_ss, resnet_pretrained_ss]
+    configs = [resnet_pretrained_ss_config, {
+        'epochs': 1,
+        'save_period': 10,
+        'batch_size': 10,
+        'checkpoint_dir': SR_path/'result/testlog',
         'log_step': 10,
-        'start_epoch': 50,
+        'start_epoch': 1,
         'criterion': nn.MSELoss(),
-        'DATASET_TYPE': 'same_300',
-        'low_res': 100,
-        'high_res': 300,
+        'DATASET_TYPE': 'same',
+        'low_res': 200,
+        'high_res': 600,
         'learning_rate': 0.005,
-        'scheduler': {'step_size': 20, 'gamma': 0.4}
+        'scheduler': {'step_size': 10, 'gamma': 0.4}
     }]
     ###################################################################################################################
     # Above is the configuration you need to set
@@ -162,13 +177,19 @@ if __name__ == '__main__':
         torch.cuda.empty_cache()
         model = models[i]
         config = configs[i]
+        ######################### setup workspace #################################################################
+        if config['start_epoch'] <= 1 and config["checkpoint_dir"].exists():
+            # not training from a checkpoint
+            shutil.rmtree(config["checkpoint_dir"])
         ######################### setup logger ####################################################################
         config["checkpoint_dir"].mkdir(parents=True, exist_ok=True)
-        logging.basicConfig(
-            filename=f'{config["checkpoint_dir"]/"log"}.log', level=logging.INFO, format='%(asctime)s - %(funcName)s - %(levelname)s - %(message)s')
-        logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
+        # logging.basicConfig(format='%(asctime)s - %(funcName)s - %(levelname)s - %(message)s')
+        logger = get_logger(os.path.basename(pathlib.Path(config["checkpoint_dir"]).absolute()), config["checkpoint_dir"]/'log.log')
+        # logging.basicConfig(
+        #     filename=f'{config["checkpoint_dir"]/"log.log"}', level=logging.INFO,
+        #     format='%(asctime)s - %(funcName)s - %(levelname)s - %(message)s')
+        # logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
         ######################### setup logger ####################################################################
-
         DATASET_TYPE = config['DATASET_TYPE']
         lr_number, hr_number = config['low_res'], config['high_res']
         train_in_dir, train_label_dir = DIV2K_path / DATASET_TYPE / \
@@ -178,15 +199,20 @@ if __name__ == '__main__':
             f'valid_{lr_number}', DIV2K_path / \
             DATASET_TYPE / f'valid_{hr_number}'
         # log training dataset info
-        logging.info("=" * 100)
-        logging.info(f"training model: {model.__class__}")
-        logging.info("Config:")
-        logging.info(config)
-        logging.info(f"dataset_type: {DATASET_TYPE}")
-        logging.info(f"low resolution: {lr_number}")
-        logging.info(f"high resolution: {hr_number}")
-        logging.info(f"checkpoint_dir: {config['checkpoint_dir']}")
-        logging.info("=" * 100)
+        logger.info("=" * 100)
+        logger.info(f"training model: {model.__class__}")
+        logger.info(f"start learning rate: {config['learning_rate']}")
+        logger.info(f"number of epochs: {config['epochs']}")
+        logger.info(f"batch_size: {config['batch_size']}")
+        logger.info(f"log step: {config['log_step']}")
+        logger.info(f"criterion: {config['criterion']}")
+        logger.info(f"dataset_type: {DATASET_TYPE}")
+        logger.info(f"low resolution: {lr_number}")
+        logger.info(f"high resolution: {hr_number}")
+        logger.info(f"checkpoint_dir: {config['checkpoint_dir']}")
+        logger.info(f"scheduler: {config['scheduler']}")
+        logger.info("=" * 100)
+
         # optimizer = optim.SGD(model.parameters(), lr=0.05)
         optimizer = optim.Adam(model.parameters(), lr=config['learning_rate'])
 
@@ -195,7 +221,6 @@ if __name__ == '__main__':
                 optimizer, step_size=config['scheduler']['step_size'], gamma=config['scheduler']['gamma'])
         else:
             scheduler = None
-
         dataset = DS(input_dir=train_in_dir, target_dir=train_label_dir,
                      transform=transforms.ToTensor())
         num_train = int(train_set_percentage * len(dataset))
@@ -203,9 +228,13 @@ if __name__ == '__main__':
         train_set, valid_set = torch.utils.data.random_split(
             dataset, [num_train, num_valid])
         train_loader = DataLoader(
-            dataset=train_set, batch_size=config['batch_size'], shuffle=True, num_workers=multiprocessing.cpu_count(), pin_memory=True)
+            dataset=train_set, batch_size=config['batch_size'],
+            shuffle=True, num_workers=multiprocessing.cpu_count(),
+            pin_memory=True)
         valid_loader = DataLoader(
-            dataset=valid_set, batch_size=config['batch_size'], shuffle=True, num_workers=multiprocessing.cpu_count(), pin_memory=True)
+            dataset=valid_set, batch_size=config['batch_size'],
+            shuffle=True, num_workers=multiprocessing.cpu_count(),
+            pin_memory=True)
         try:
             train(model,
                   config['criterion'],
@@ -218,8 +247,8 @@ if __name__ == '__main__':
                   valid_loader,
                   scheduler)
         except Exception as e:
-            logging.error(e)
-            logging.error("Failed! Skip to next model if there is any left.")
+            logger.error(e)
+            logger.error("Failed! Skip to next model if there is any left.")
             continue
         del train_set, valid_set, dataset, train_loader, valid_loader, optimizer, scheduler
 
@@ -229,9 +258,13 @@ if __name__ == '__main__':
             weight_files = sorted(os.listdir(weight_path), key=lambda filename: int(
                 re.findall('epoch(\d{1,})\.pth', filename)[0]))
             if len(weight_files) != 0:
-                logging.info("Running tests")
-                test_all.main(config['DATASET_TYPE'], config['low_res'],
-                              config['high_res'], weight_path/weight_files[-1], config['checkpoint_dir']/'test', model.__class__.__name__)
+                logger.info("Running tests")
+                test_all.main(
+                    config['DATASET_TYPE'],
+                    config['low_res'],
+                    config['high_res'],
+                    weight_path / weight_files[-1],
+                    config['checkpoint_dir'] / 'test', model.__class__.__name__)
         except KeyError as e:
-            logging.error(
+            logger.error(
                 "Test images failed to generate. Likely your model is not registered in the test_all.py file. Modify the map dictionary called model_map")

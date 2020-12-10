@@ -33,6 +33,7 @@ class Trainer(BaseTrainer):
         :param epoch: Integer, current epoch.
         :return: A log that contains training information of current epoch
         """
+        self.logger.debug(f'train epoch {epoch}')
         self.model.train()
         total_loss = 0.0
         for batch_idx, (data, target) in enumerate(self.train_dataloader):
@@ -50,7 +51,7 @@ class Trainer(BaseTrainer):
                                               self.valid_loss[-1].item() if len(self.valid_loss) != 0 else None),
                                           lr=get_lr(self.optimizer))
             del data, target, loss
-        self.train_loss.append(total_loss / len(self.train_dataset))
+        self.train_loss.append(total_loss / len(self.train_dataloader))
 
         # do validation
         valid_loss = self._valid_epoch(epoch) if self.do_validation else None
@@ -65,6 +66,7 @@ class Trainer(BaseTrainer):
         :param epoch: Integer, current epoch
         :return: A log that contains validation information of current epoch
         """
+        self.logger.debug(f'validate epoch {epoch}')
         self.model.eval()
         total_loss = 0.0
         with torch.no_grad():
@@ -74,7 +76,7 @@ class Trainer(BaseTrainer):
                 loss = self.criterion(output, target)
                 total_loss += loss
                 del data, target, output, loss
-        return total_loss / len(self.valid_dataset)
+            return total_loss / len(self.valid_dataloader)
 
     def _progress(self, batch_idx):
         # base = '[{}/{} ({:.0f}%)]'
@@ -89,6 +91,7 @@ class Trainer(BaseTrainer):
 
     def _save_checkpoint(self, epoch):
         super(Trainer, self)._save_checkpoint(epoch)
+        self.logger.debug(f'save checkpoint for epoch {epoch}')
         # save one batch of validation image
         self.model.eval()
         with torch.no_grad():
