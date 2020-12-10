@@ -28,7 +28,8 @@ class BaseTrainer:
         self.epochs = config['epochs']
         self.save_period = config['save_period']
         self.start_epoch = config['start_epoch']
-        self.logger = logging.getLogger(os.path.basename(pathlib.Path(config["checkpoint_dir"]).absolute()))
+        self.logger = logging.getLogger(os.path.basename(
+            pathlib.Path(config["checkpoint_dir"]).absolute()))
         if self.start_epoch == 0:
             raise ValueError("start_epoch must start from at least 1")
         self.progress_bar = None
@@ -36,6 +37,8 @@ class BaseTrainer:
         self.model_weights_dir = self.checkpoint_dir / 'weights'
         self.valid_results = self.checkpoint_dir / 'validation'
         self.log_path = self.checkpoint_dir / 'log.log'
+        self.max_gpu_memory_used = util.get_gpu_memory_usage()
+        self.max_mem_used = util.get_memory_usage()
         # load valid_loss and train_loss if this is not starting from the beginning
         if self.start_epoch != 1:
             self.logger.info("loadding loss files with numpy")
@@ -93,7 +96,23 @@ class BaseTrainer:
                 if epoch % self.save_period == 0 or epoch == self.epochs:
                     self._save_checkpoint(epoch)
                 self._update_loss_plot()
+                self.logger.debug(
+                    f"MAX GPU Usage (epoch {epoch}): {self.max_gpu_memory_used}MB")
+                self.logger.debug(
+                    f"MAX Memory Usage (epoch {epoch}): {self.max_mem_used}MB")
+                self.max_gpu_memory_used = max(
+                    self.max_gpu_memory_used, util.get_gpu_memory_usage())
+                self.max_mem_used = max(
+                    self.max_mem_used, util.get_memory_usage())
         self.progress_bar.close()
+        self.logger.info(
+            "============================== Training Finished ==============================")
+        self.logger.info(
+            f"Max GPU Usage: {self.max_gpu_memory_used}MB/{util.get_total_gpu_memory()}MB ({round(self.max_gpu_memory_used/util.get_total_gpu_memory()*100, 2)}%)")
+        self.logger.info(
+            f"Max Memory Usage: {self.max_mem_used}MB/{util.get_total_memory()}MB ({round(self.max_mem_used/util.get_total_memory()*100, 2)}%)")
+        self.logger.info(
+            "============================== Training Finished ==============================")
 
     def _update_loss_plot(self):
         # training loss plot
