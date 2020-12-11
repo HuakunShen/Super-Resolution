@@ -99,7 +99,7 @@ class BaseTrainer:
                 self.logger.debug(
                     f"MAX GPU Usage (epoch {epoch}): {self.max_gpu_memory_used}MB")
                 self.logger.debug(
-                    f"MAX Memory Usage (epoch {epoch}): {self.max_mem_used}MB")
+                    f"MAX Memory Usage (epoch {epoch}): {round(self.max_mem_used, 2)}MB")
                 self.max_gpu_memory_used = max(
                     self.max_gpu_memory_used, util.get_gpu_memory_usage())
                 self.max_mem_used = max(

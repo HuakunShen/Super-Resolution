@@ -54,7 +54,7 @@ class Saver():
         plt.close()
 
 
-def main(type_, lr_size, hr_size, weight_path, output_path, model_name):
+def main(type_, lr_size, hr_size, weight_path, output_path, model_name, multiprocess=False):
     print(f"""
     running test all with
     type: {type_}
@@ -81,23 +81,28 @@ def main(type_, lr_size, hr_size, weight_path, output_path, model_name):
     model.eval()
     image_names = os.listdir(valid_lr)
 
-    for image_name in tqdm(image_names):
-        Saver(output_path, valid_lr, valid_hr, model)(image_name)
-
-    # with multiprocessing.Pool(multiprocessing.cpu_count()) as p:
-    #     with tqdm(total=len(image_names)) as pbar:
-    #         for i, y in enumerate(p.imap_unordered(Saver(output_path, valid_lr, valid_hr,
-    #                                                      model), image_names)):
-    #             pbar.update()
+    if multiprocess:
+        with multiprocessing.Pool(multiprocessing.cpu_count()) as p:
+            with tqdm(total=len(image_names)) as pbar:
+                for i, y in enumerate(p.imap_unordered(Saver(output_path, valid_lr, valid_hr,
+                                                             model), image_names)):
+                    pbar.update()
+    else:
+        for image_name in tqdm(image_names):
+            Saver(output_path, valid_lr, valid_hr, model)(image_name)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser('test all arg parser')
-    parser.add_argument("-t", "--type", help="can be either same or diff")
-    parser.add_argument("--low", help="low resolution")
-    parser.add_argument("--high", help="high resolution")
-    parser.add_argument("-w", "--weight", help="weight path")
-    parser.add_argument("-o", "--output", help="output path")
-    parser.add_argument("-m", "--model", help="model name")
+    parser.add_argument("-t", "--type", required=True,
+                        help="can be either same or diff")
+    parser.add_argument("--low", required=True, help="low resolution")
+    parser.add_argument("--high", required=True, help="high resolution")
+    parser.add_argument("-w", "--weight", required=True, help="weight path")
+    parser.add_argument("-o", "--output", required=True, help="output path")
+    parser.add_argument("-m", "--model", required=True, help="model name")
+    parser.add_argument("-M", "--multiprocess",
+                        action='store_true', help="model name")
     args = parser.parse_args()
-    main(args.type, args.low, args.high, args.weight, args.output, args.model)
+    main(args.type, args.low, args.high, args.weight,
+         args.output, args.model, args.multiprocess)

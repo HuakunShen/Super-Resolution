@@ -54,8 +54,6 @@ class Trainer(BaseTrainer):
             self.max_gpu_memory_used = max(
                 self.max_gpu_memory_used, get_gpu_memory_usage())
             self.max_mem_used = max(self.max_mem_used, get_memory_usage())
-
-            del data, target, loss
         self.train_loss.append(total_loss / len(self.train_dataloader))
 
         # do validation
@@ -80,7 +78,6 @@ class Trainer(BaseTrainer):
                 output = self.model(data)
                 loss = self.criterion(output, target)
                 total_loss += loss
-                del data, target, output, loss
             return total_loss / len(self.valid_dataloader)
 
     def _progress(self, batch_idx):
@@ -119,6 +116,5 @@ class Trainer(BaseTrainer):
                 axes[i][2].imshow(target_images[i])
             fig.savefig(output_path)
             plt.close()
-            del data, target, input_images, output_images, target_images
         np.savetxt(self.checkpoint_dir / 'valid_loss.txt', self.valid_loss)
         np.savetxt(self.checkpoint_dir / 'train_loss.txt', self.train_loss)

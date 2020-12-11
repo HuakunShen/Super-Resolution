@@ -184,7 +184,8 @@ if __name__ == '__main__':
         ######################### setup logger ####################################################################
         config["checkpoint_dir"].mkdir(parents=True, exist_ok=True)
         # logging.basicConfig(format='%(asctime)s - %(funcName)s - %(levelname)s - %(message)s')
-        logger = get_logger(os.path.basename(pathlib.Path(config["checkpoint_dir"]).absolute()), config["checkpoint_dir"]/'log.log')
+        logger = get_logger(os.path.basename(pathlib.Path(
+            config["checkpoint_dir"]).absolute()), config["checkpoint_dir"]/'log.log')
         # logging.basicConfig(
         #     filename=f'{config["checkpoint_dir"]/"log.log"}', level=logging.INFO,
         #     format='%(asctime)s - %(funcName)s - %(levelname)s - %(message)s')
@@ -250,7 +251,6 @@ if __name__ == '__main__':
             logger.error(e)
             logger.error("Failed! Skip to next model if there is any left.")
             continue
-        del train_set, valid_set, dataset, train_loader, valid_loader, optimizer, scheduler
 
         # run test images
         try:
