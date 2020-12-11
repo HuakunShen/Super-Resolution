@@ -25,6 +25,7 @@ from model.VDSR import VDSR
 from model.UNetSR import UNetSR
 import test_all
 from logger import get_logger
+from utils.loss import loss_sum # input image must be larger than 224x224
 
 
 def train(mod: nn.Module, criterion, optimizer_, device_, config_, train_dataset, valid_dataset, train_dataloader,
