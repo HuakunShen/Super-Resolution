@@ -145,3 +145,5 @@ pytorch-template/
 SR/result
 
 ._.DS_Store
+
+*.code-workspace

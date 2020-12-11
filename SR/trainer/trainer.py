@@ -102,9 +102,11 @@ class Trainer(BaseTrainer):
             output_path = self.valid_results / f'epoch{epoch}.png'
             # output_path.mkdir(parents=True, exist_ok=False)
             output = self.model(data)
-            input_images = [transforms.ToPILImage()(img) for img in data]
-            output_images = [transforms.ToPILImage()(img) for img in output]
-            target_images = [transforms.ToPILImage()(img) for img in target]
+            input_images = [transforms.ToPILImage()(img.cpu()) for img in data]
+            output_images = [transforms.ToPILImage()(img.cpu())
+                             for img in output]
+            target_images = [transforms.ToPILImage()(img.cpu())
+                             for img in target]
             plot_height = self.valid_dataloader.batch_size * 10 * 2 // 3
             fig, axes = plt.subplots(
                 nrows=len(input_images), ncols=3, figsize=(20, plot_height))
