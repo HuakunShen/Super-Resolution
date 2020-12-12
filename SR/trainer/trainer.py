@@ -6,7 +6,7 @@ from torchvision import transforms
 from trainer.base_trainer import BaseTrainer
 import matplotlib.pyplot as plt
 import numpy as np
-from utils.util import get_lr, get_gpu_memory_usage_percentage, get_gpu_memory_usage, get_gpu_memory_usage_percentage, get_memory_usage, get_memory_usage_percentage
+from utils.util import get_lr
 
 
 class Trainer(BaseTrainer):
@@ -51,9 +51,7 @@ class Trainer(BaseTrainer):
                                               self.valid_loss[-1].item() if len(self.valid_loss) != 0 else None),
                                           lr=get_lr(self.optimizer))
             #   gpu="{:.0f}%".format(get_gpu_memory_usage_percentage()), mem="{:.0f}%".format(get_memory_usage_percentage()))
-            self.max_gpu_memory_used = max(
-                self.max_gpu_memory_used, get_gpu_memory_usage())
-            self.max_mem_used = max(self.max_mem_used, get_memory_usage())
+            self.memory_profiler.update()
         self.train_loss.append(total_loss / len(self.train_dataloader))
 
         # do validation
