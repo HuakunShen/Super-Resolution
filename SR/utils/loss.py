@@ -28,6 +28,7 @@ class FeatureExtractor(nn.Module):
         return features
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! loss !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 # input images must be larger than 224x224
 fe = FeatureExtractor().to(device)
 

@@ -12,7 +12,7 @@ from torchvision import transforms
 from model.FSRCNN import FSRCNN, FSRCNN_Original
 from model.SRCNN import SRCNN
 from model.UNetSR import UNetSR
-
+from config import DIV2K_DATASET_PATH
 """
 Example:
 python3 test_all.py --model FSRCNN -t diff --low 200 --high 600 -w /home/hacker/Documents/Super-Resolution/SR/result/FSRCNN_new/weights/epoch25.pth -o /home/hacker/Documents/Super-Resolution/SR/result/FSRCNN_new/test
@@ -70,11 +70,10 @@ def main(type_, lr_size, hr_size, weight_path, output_path, model_name, multipro
     if output_path.exists():
         shutil.rmtree(output_path)
     output_path.mkdir(parents=True, exist_ok=False)
-    DIV2K_DIR = pathlib.Path('../datasets/DIV2K')
-    image_dir = DIV2K_DIR/type_
+    image_dir = DIV2K_DATASET_PATH/type_
     valid_lr = image_dir/f'valid_{lr_size}'
     valid_hr = image_dir/f'valid_{hr_size}'
-    assert DIV2K_DIR.exists() and image_dir.exists(
+    assert DIV2K_DATASET_PATH.exists() and image_dir.exists(
     ) and valid_lr.exists() and valid_hr.exists()
 
     model.load_state_dict(torch.load(weight_path))

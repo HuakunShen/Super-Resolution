@@ -12,7 +12,7 @@ from trainer.trainer import Trainer
 from torchvision import transforms
 from torch.optim import lr_scheduler
 from torch.utils.data import DataLoader
-from dataloader.datasets import DIV2K_Square_Dataset
+from dataloader.datasets import DIV2KSquareDataset
 from model.FSRCNN import FSRCNN, FSRCNN_Original
 from model.resnet_sr import ResNetPretrainedSS, ResNetPretrainedDS, ResNetPretrainedDSRes
 from model.DRRN import DRRN
@@ -66,7 +66,7 @@ if __name__ == '__main__':
         'train_50', DIV2K_path / DATASET_TYPE / 'train_150'
     test_in_dir, test_label_dir = DIV2K_path / DATASET_TYPE / \
         'valid_50', DIV2K_path / DATASET_TYPE / 'valid_150'
-    DS = DIV2K_Square_Dataset
+    DS = DIV2KSquareDataset
 
     train_set_percentage = 0.8
 

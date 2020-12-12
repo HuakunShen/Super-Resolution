@@ -1,16 +1,15 @@
 import os
-import re
 import sys
-import torchvision
 import torch
 import pathlib
 from PIL import Image
-from torch.utils.data import Dataset, DataLoader
-from torchvision.transforms import ToTensor, ToPILImage
+from torch.utils.data import Dataset
+from torchvision.transforms import ToTensor
 from torchvision import transforms
 from tqdm import tqdm
 
-class DIV2K_Square_Dataset(Dataset):
+
+class DIV2KSquareDataset(Dataset):
     def __init__(self, input_dir: str, target_dir: str, transform=ToTensor()) -> None:
         # verify data integrity
         input_files, target_files = os.listdir(
@@ -48,8 +47,8 @@ if __name__ == '__main__':
     lr_train = DIV2K_path / 'same' / 'train_150'
     lr_valid = DIV2K_path / 'same' / 'valid_150'
     datasets = {
-        'train': DIV2K_Square_Dataset(input_dir=lr_train, target_dir=hr_train, transform=transforms.ToTensor()),
-        'val': DIV2K_Square_Dataset(input_dir=lr_valid, target_dir=hr_valid, transform=transforms.ToTensor())
+        'train': DIV2KSquareDataset(input_dir=lr_train, target_dir=hr_train, transform=transforms.ToTensor()),
+        'val': DIV2KSquareDataset(input_dir=lr_valid, target_dir=hr_valid, transform=transforms.ToTensor())
     }
     dataloaders = {x: torch.utils.data.DataLoader(datasets[x], batch_size=4, shuffle=True, num_workers=4) for x in
                    ['train', 'val']}
@@ -62,9 +61,3 @@ if __name__ == '__main__':
     with tqdm(dataloaders['val'], file=sys.stdout) as pbar:
         for i, (data, label) in enumerate(pbar):
             pbar.set_postfix(training_loss=i, validation_loss=i)
-
-
-
-
-
-
