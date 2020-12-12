@@ -40,11 +40,13 @@ def run(models: List[nn.Module], configs: List[dict]):
         ######################### setup dataset path #########################
         lr_number, hr_number = config['low_res'], config['high_res']
         train_in_dir, train_label_dir = DIV2K_DATASET_PATH / config['dataset_type'] / \
-                                        f'train_{lr_number}', DIV2K_DATASET_PATH / \
-                                        config['dataset_type'] / f'train_{hr_number}'
+            f'train_{lr_number}', DIV2K_DATASET_PATH / \
+            config['dataset_type'] / \
+            f'train_{hr_number}'
         test_in_dir, test_label_dir = DIV2K_DATASET_PATH / config['dataset_type'] / \
-                                      f'valid_{lr_number}', DIV2K_DATASET_PATH / \
-                                      config['dataset_type'] / f'valid_{hr_number}'
+            f'valid_{lr_number}', DIV2K_DATASET_PATH / \
+            config['dataset_type'] / \
+            f'valid_{hr_number}'
         # log training dataset info
         ######################### log training dataset info #########################
 
@@ -74,7 +76,8 @@ def run(models: List[nn.Module], configs: List[dict]):
             shuffle=True, num_workers=config['num_worker'],
             pin_memory=True)
         try:
-            device_name = torch.cuda.get_device_name(config['device']) if config['device'].type != 'cpu' else 'cpu'
+            device_name = torch.cuda.get_device_name(
+                config['device']) if config['device'].type != 'cpu' else 'cpu'
             logger.info(f"Running on {device_name}\n")
             trainer = Trainer(model=model,
                               criterion=config['criterion'],
@@ -107,9 +110,12 @@ def run(models: List[nn.Module], configs: List[dict]):
                     config['low_res'],
                     config['high_res'],
                     weight_path / weight_files[-1],
-                    config['checkpoint_dir'] / 'test', model.__class__.__name__,
+                    config['checkpoint_dir'] /
+                    'test', model.__class__.__name__,
                     logger=logger,
-                    multiprocess=True)
+                    multiprocess_num_cpu=1 if 'test_all_multiprocess_cpu' in config else config[
+                        'test_all_multiprocess_cpu']
+                )
         except KeyError as e:
             error_traceback = traceback.format_exc()
             logger.error(e)

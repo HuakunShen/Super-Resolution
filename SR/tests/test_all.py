@@ -56,7 +56,7 @@ class Saver():
         plt.close()
 
 
-def main(type_, lr_size, hr_size, weight_path, output_path, model_name, logger: logging.Logger, multiprocess=False):
+def main(type_, lr_size, hr_size, weight_path, output_path, model_name,  logger: logging.Logger, multiprocess_num_cpu: int = 1):
     logger.info(f"""
     running test all with
     type: {type_}
@@ -82,7 +82,7 @@ def main(type_, lr_size, hr_size, weight_path, output_path, model_name, logger: 
     model.eval()
     image_names = os.listdir(valid_lr)
 
-    if multiprocess and multiprocessing.cpu_count() > 2:
+    if multiprocessing.cpu_count() > 2 and multiprocess_num_cpu > 2:
         num_core_to_use = multiprocessing.cpu_count() // 2
         logger.info(f"Using {num_core_to_use} cores to generate test images")
         with multiprocessing.Pool(num_core_to_use) as p:
@@ -97,7 +97,8 @@ def main(type_, lr_size, hr_size, weight_path, output_path, model_name, logger: 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser('test all arg parser')
-    parser.add_argument("-t", "--type", required=True, help="can be either same or diff")
+    parser.add_argument("-t", "--type", required=True,
+                        help="can be either same or diff")
     parser.add_argument("--low", required=True, help="low resolution")
     parser.add_argument("--high", required=True, help="high resolution")
     parser.add_argument("-w", "--weight", required=True, help="weight path")
