@@ -19,19 +19,19 @@ if __name__ == '__main__':
         'epochs': 1,
         'save_period': 10,
         'batch_size': 20,
-        'checkpoint_dir': SR_PATH / 'result/SRCNN-100-300-100iter-scheduler',
+        'checkpoint_dir': SR_PATH / 'result/SRCNN-100-300-scheduler',
         'log_step': 10,
         'start_epoch': 1,
         'criterion': nn.MSELoss(),
         'dataset_type': 'same_300',
         'low_res': 100,
         'high_res': 300,
-        'learning_rate': 0.005,
         'device': device,
         'scheduler': {'step_size': 1, 'gamma': 0.4},
-        'optimizer': optim.Adam(srcnn.parameters(), lr=0.005),
+        'optimizer': optim.Adam(srcnn.parameters(), lr=0.001),
         'train_set_percentage': 0.96,
-        'num_worker': multiprocessing.cpu_count()
+        'num_worker': multiprocessing.cpu_count(),
+        'test_all_multiprocess_cpu': 1
     }
     models = [srcnn]
     configs = [srcnn_config]
