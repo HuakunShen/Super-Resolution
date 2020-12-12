@@ -18,6 +18,7 @@ from model.FSRCNN import FSRCNN, FSRCNN_Original
 from model.resnet_sr import ResNetPretrainedSS
 from model.SRCNN import SRCNN
 from model.UNetSR import UNetSR
+from utils.util import get_divider_str
 from tests import test_all
 from logger import get_logger
 from config import SR_PATH, DIV2K_DATASET_PATH
@@ -49,12 +50,11 @@ def run(models: List[nn.Module], configs: List[dict]):
             f'valid_{hr_number}'
         # log training dataset info
         ######################### log training dataset info #########################
-
-        logger.info("=" * 30 + " Configuration Parameters " + "=" * 30)
+        logger.info(get_divider_str("Configuration Parameters Start"))
         logger.info(f"training model: {model.__class__}")
         for key in config:
             logger.info(f"{key}: {config[key]}")
-        logger.info("=" * 30 + " Configuration Parameters " + "=" * 30)
+        logger.info(get_divider_str("Configuration Parameters End"))
         optimizer = config['optimizer']
         if 'scheduler' in config and config['scheduler'] is not None:
             scheduler = lr_scheduler.StepLR(

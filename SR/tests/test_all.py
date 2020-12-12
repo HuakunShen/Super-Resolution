@@ -10,6 +10,7 @@ from tqdm import tqdm
 import multiprocessing
 import matplotlib.pyplot as plt
 from torchvision import transforms
+from utils.util import get_divider_str
 from model.FSRCNN import FSRCNN, FSRCNN_Original
 from model.SRCNN import SRCNN
 from model.UNetSR import UNetSR

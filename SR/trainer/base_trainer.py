@@ -5,15 +5,15 @@ import torch
 import pathlib
 import logging
 from tqdm import tqdm
+from utils.util import get_divider_str
 from abc import abstractmethod
 import matplotlib.pyplot as plt
 from logger.memory_profile import MemoryProfiler
+from config import MSG_DIVIDER_LEN
 
 
 class BaseTrainer:
-    """
-    Base class for all trainers
-    """
+    """Base class for all trainers"""
 
     def __init__(self, model, criterion, optimizer, train_dataset, valid_dataset, config: dict):
         self.model = model
@@ -35,16 +35,28 @@ class BaseTrainer:
         self.log_path = self.checkpoint_dir / 'log.log'
         self.memory_profiler = MemoryProfiler(self.logger)
         # load valid_loss and train_loss if this is not starting from the beginning
-        if self.start_epoch != 1:
+
+        if self.start_epoch != 1 and not self.checkpoint_dir.exists():
+            raise ValueError(
+                "Start Epoch is not 1 but checkpoint directory doesn't exist. Verify your Configurations.")
+        if self.start_epoch != 1 and self.checkpoint_dir.exists():
             self.logger.info("loadding loss files with numpy")
             self.train_loss = list(np.loadtxt(
                 self.checkpoint_dir / 'valid_loss.txt'))
             self.valid_loss = list(np.loadtxt(
                 self.checkpoint_dir / 'train_loss.txt'))
-            self.logger.debug(
+            if len(self.train_loss) < self.start_epoch or len(self.valid_loss) < self.start_epoch:
+                raise ValueError(
+                    f'There is not enough loss in previous loss files.\n'
+                    f'Start Epoch={self.start_epoch}, train_loss length={len(self.train_loss)}, '
+                    f'valid_loss length={len(self.valid_loss)}')
+            else:
+                self.train_loss = self.train_loss[:self.start_epoch]
+                self.valid_loss = self.valid_loss[:self.start_epoch]
+            self.logger.info(
                 f'loaded training loss from previous train (length={len(self.train_loss)}):')
             self.logger.debug(self.train_loss)
-            self.logger.debug(
+            self.logger.info(
                 f'loaded validation loss from previous train (length={len(self.valid_loss)}):')
             self.logger.debug(self.valid_loss)
         else:
@@ -52,9 +64,6 @@ class BaseTrainer:
             self.valid_loss = []
 
         # # load checkpoint weights if needed
-        # if self.start_epoch <= 1 and self.checkpoint_dir.exists():
-        #     # not training from a checkpoint
-        #     shutil.rmtree(self.checkpoint_dir)
         if not (self.start_epoch <= 1 and self.checkpoint_dir.exists()):
             # load weights
             self.logger.info(
@@ -81,8 +90,7 @@ class BaseTrainer:
         raise NotImplementedError
 
     def train(self):
-        self.logger.info(
-            "============================== Training Started ==============================")
+        self.logger.info(get_divider_str('Training Started', MSG_DIVIDER_LEN))
         start_time = time.time()
         with tqdm(total=len(self.train_dataset) * (self.epochs - self.start_epoch + 1)) as progress_bar:
             # with tqdm(range(self.start_epoch, self.epochs + 1), total=self.epochs, file=sys.stdout) as progress_bar:
@@ -96,14 +104,13 @@ class BaseTrainer:
                 self._update_loss_plot()
                 self.memory_profiler.update_n_log(epoch)
         self.progress_bar.close()
-        self.logger.info(
-            "============================== Training Finished ==============================")
+        self.logger.info(get_divider_str('Training Finished', MSG_DIVIDER_LEN))
         self.memory_profiler.log_final_message()
-        elapsed_time = time.strftime("%H:%M:%S", time.gmtime(time.time() - start_time))
+        elapsed_time = time.strftime(
+            "%H:%M:%S", time.gmtime(time.time() - start_time))
         self.logger.info(f"Total Training Time: {elapsed_time}")
-        self.logger.info(
-            "============================== Training Finished ==============================")
-        self.logger.info("saving final checkpoint")
+        self.logger.info(get_divider_str(
+            'Saving Final Checkpoint', MSG_DIVIDER_LEN))
 
     def _update_loss_plot(self):
         # training loss plot
