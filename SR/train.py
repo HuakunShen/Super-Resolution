@@ -6,6 +6,7 @@ import shutil
 import pathlib
 import logging
 import argparse
+import traceback
 import torchvision
 import multiprocessing
 from torch import nn
@@ -248,7 +249,9 @@ if __name__ == '__main__':
                   valid_loader,
                   scheduler)
         except Exception as e:
+            error_traceback = traceback.format_exc()
             logger.error(e)
+            logger.error(error_traceback)
             logger.error("Failed! Skip to next model if there is any left.")
             continue
 
@@ -266,5 +269,8 @@ if __name__ == '__main__':
                     weight_path / weight_files[-1],
                     config['checkpoint_dir'] / 'test', model.__class__.__name__)
         except KeyError as e:
+            error_traceback = traceback.format_exc()
+            logger.error(e)
+            logger.error(error_traceback)
             logger.error(
                 "Test images failed to generate. Likely your model is not registered in the test_all.py file. Modify the map dictionary called model_map")

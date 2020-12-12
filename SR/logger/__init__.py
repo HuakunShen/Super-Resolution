@@ -12,7 +12,7 @@ def get_logger(logger_name, filename):
     fh = logging.FileHandler(filename)
     fh.setLevel(logging.DEBUG)
     formatter = logging.Formatter(
-        '%(asctime)s - %(funcName)s - %(levelname)s - %(message)s')
+        '%(asctime)s - %(filename)s - %(module)s - %(funcName)s - %(levelname)s - %(message)s')
     fh.setFormatter(formatter)
     logger.addHandler(fh)
     logger.addHandler(ch)
