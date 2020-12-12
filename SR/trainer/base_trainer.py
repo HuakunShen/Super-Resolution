@@ -1,4 +1,5 @@
 import os
+import time
 import numpy as np
 import torch
 import pathlib
@@ -80,6 +81,7 @@ class BaseTrainer:
         raise NotImplementedError
 
     def train(self):
+        start_time = time.time()
         with tqdm(total=len(self.train_dataset) * (self.epochs - self.start_epoch + 1)) as progress_bar:
             # with tqdm(range(self.start_epoch, self.epochs + 1), total=self.epochs, file=sys.stdout) as progress_bar:
             self.progress_bar = progress_bar
@@ -92,7 +94,13 @@ class BaseTrainer:
                 self._update_loss_plot()
                 self.memory_profiler.update_n_log(epoch)
         self.progress_bar.close()
+        self.logger.info(
+            "============================== Training Finished ==============================")
         self.memory_profiler.log_final_message()
+        elapsed_time = time.strftime("%H:%M:%S", time.gmtime(time.time() - start_time))
+        self.logger.info(f"Total Training Time: {elapsed_time}")
+        self.logger.info(
+            "============================== Training Finished ==============================")
 
     def _update_loss_plot(self):
         # training loss plot

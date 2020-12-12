@@ -115,6 +115,7 @@ def run(models: List[nn.Module], configs: List[dict]):
                     config['high_res'],
                     weight_path / weight_files[-1],
                     config['checkpoint_dir'] / 'test', model.__class__.__name__,
+                    logger=logger,
                     multiprocess=True)
         except KeyError as e:
             error_traceback = traceback.format_exc()

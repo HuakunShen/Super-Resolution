@@ -44,12 +44,8 @@ class MemoryProfiler(object):
 
     def log_final_message(self):
         self.logger.info(
-            "============================== Training Finished ==============================")
-        self.logger.info(
             f"Max GPU Usage: {self.max_gpu_memory_used}MB/{get_total_gpu_memory(mode=self.gpu_mem_mode)}MB "
             f"({round(self.max_gpu_memory_used / get_total_gpu_memory(mode=self.gpu_mem_mode) * 100, 2)}%)")
         self.logger.info(
             f"Max Memory Usage: {self.max_mem_used}MB/{get_total_memory()}MB "
             f"({round(self.max_mem_used / get_total_memory() * 100, 2)}%)")
-        self.logger.info(
-            "============================== Training Finished ==============================")
