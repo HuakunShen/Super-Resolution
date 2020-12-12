@@ -3,8 +3,6 @@ import logging
 
 
 def get_logger(logger_name, filename):
-    print(logger_name)
-    print(filename)
     logger = logging.getLogger(logger_name)
     logger.setLevel(logging.DEBUG)
     ch = logging.StreamHandler()

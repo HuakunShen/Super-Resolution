@@ -81,6 +81,8 @@ class BaseTrainer:
         raise NotImplementedError
 
     def train(self):
+        self.logger.info(
+            "============================== Training Started ==============================")
         start_time = time.time()
         with tqdm(total=len(self.train_dataset) * (self.epochs - self.start_epoch + 1)) as progress_bar:
             # with tqdm(range(self.start_epoch, self.epochs + 1), total=self.epochs, file=sys.stdout) as progress_bar:
@@ -101,6 +103,7 @@ class BaseTrainer:
         self.logger.info(f"Total Training Time: {elapsed_time}")
         self.logger.info(
             "============================== Training Finished ==============================")
+        self.logger.info("saving final checkpoint")
 
     def _update_loss_plot(self):
         # training loss plot
