@@ -5,6 +5,7 @@ import torch.optim as optim
 from model.SRCNN import SRCNN
 from trainer import train
 from config import SR_PATH
+from utils.loss import LossSum, FeatureExtractor
 
 
 if __name__ == '__main__':
@@ -14,6 +15,10 @@ if __name__ == '__main__':
     ###################################################################################################################
     # Below is the configuration you need to set
     ###################################################################################################################
+    fe = FeatureExtractor().to(device)
+    criterion = LossSum(fe)
+    criterion(1, 2)
+
     srcnn = SRCNN(in_channel=3).to(device)
     srcnn_config = {
         'epochs': 1,
