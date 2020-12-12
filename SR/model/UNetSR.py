@@ -195,10 +195,120 @@ class UNetSR(nn.Module):
         return x
 
 
+class UNetNoTop(nn.Module):
+    """
+    remove top layer skip connection
+    """
+
+    def __init__(self, in_c: int = 3, out_c: int = 3):
+        super(UNetNoTop, self).__init__()
+        self.MaxPool2d = nn.MaxPool2d(kernel_size=2, stride=2)
+        # encoder part
+        self.encoder_conv_1 = double_convolution(in_c, 64)
+        self.encoder_conv_2 = double_convolution(64, 128)
+        self.encoder_conv_3 = double_convolution(128, 256)
+        self.encoder_conv_4 = double_convolution(256, 512)
+        self.encoder_conv_5 = double_convolution(512, 1024)
+        # decoder part
+        self.ConvT2D_1 = nn.ConvTranspose2d(
+            in_channels=1024, out_channels=512, kernel_size=2, stride=2, output_padding=1)
+        self.decoder_conv_1 = double_convolution(1024, 512)
+        self.ConvT2D_2 = nn.ConvTranspose2d(
+            in_channels=512, out_channels=256, kernel_size=2, stride=2, output_padding=1)
+        self.decoder_conv_2 = double_convolution(512, 256)
+        self.ConvT2D_3 = nn.ConvTranspose2d(
+            in_channels=256, out_channels=128, kernel_size=2, stride=2)
+        self.decoder_conv_3 = double_convolution(256, 128)
+        self.ConvT2D_4 = nn.ConvTranspose2d(
+            in_channels=128, out_channels=64, kernel_size=2, stride=2)
+        self.decoder_conv_4 = double_convolution(64, 64)
+        # output layer to 3 channels
+        self.final = nn.Conv2d(64, out_c, kernel_size=1)
+
+    def forward(self, image):
+        x1 = self.encoder_conv_1(image)    # to be concatenated to decoder
+        x2 = self.MaxPool2d(x1)
+        x3 = self.encoder_conv_2(x2)       # to be concatenated to decoder
+        x4 = self.MaxPool2d(x3)
+        x5 = self.encoder_conv_3(x4)       # to be concatenated to decoder
+        x6 = self.MaxPool2d(x5)
+        x7 = self.encoder_conv_4(x6)       # to be concatenated to decoder
+        x8 = self.MaxPool2d(x7)
+        x9 = self.encoder_conv_5(x8)
+        x = self.ConvT2D_1(x9)
+        x = self.decoder_conv_1(torch.cat([x, x7], 1))
+        x = self.ConvT2D_2(x)
+        x = self.decoder_conv_2(torch.cat([x, x5], 1))
+        x = self.ConvT2D_3(x)
+        x = self.decoder_conv_3(torch.cat([x, x3], 1))
+        x = self.ConvT2D_4(x)
+        # x = self.decoder_conv_4(torch.cat([x, x1], 1))
+        x = self.decoder_conv_4(x)
+        x = self.final(x)
+        return x
+
+
+class UNetD4(nn.Module):
+    """
+    UNet depth=4, instead of original 5 layers
+    """
+
+    def __init__(self, in_c: int = 3, out_c: int = 3):
+        super(UNetD4, self).__init__()
+        self.MaxPool2d = nn.MaxPool2d(kernel_size=2, stride=2)
+        # encoder part
+        self.encoder_conv_1 = double_convolution(in_c, 64)
+        self.encoder_conv_2 = double_convolution(64, 128)
+        self.encoder_conv_3 = double_convolution(128, 256)
+        self.encoder_conv_4 = double_convolution(256, 512)
+        self.encoder_conv_5 = double_convolution(512, 1024)
+        # decoder part
+        self.ConvT2D_1 = nn.ConvTranspose2d(
+            in_channels=1024, out_channels=512, kernel_size=2, stride=2, output_padding=1)
+        self.decoder_conv_1 = double_convolution(1024, 512)
+        self.ConvT2D_2 = nn.ConvTranspose2d(
+            in_channels=512, out_channels=256, kernel_size=2, stride=2, output_padding=1)
+        self.decoder_conv_2 = double_convolution(512, 256)
+        self.ConvT2D_3 = nn.ConvTranspose2d(
+            in_channels=256, out_channels=128, kernel_size=2, stride=2)
+        self.decoder_conv_3 = double_convolution(256, 128)
+        self.ConvT2D_4 = nn.ConvTranspose2d(
+            in_channels=128, out_channels=64, kernel_size=2, stride=2)
+        self.decoder_conv_4 = double_convolution(128, 64)
+        # output layer to 3 channels
+        self.final = nn.Conv2d(64, out_c, kernel_size=1)
+
+    def forward(self, image):
+        x1 = self.encoder_conv_1(image)    # to be concatenated to decoder
+        x2 = self.MaxPool2d(x1)
+
+        x3 = self.encoder_conv_2(x2)       # to be concatenated to decoder
+        x4 = self.MaxPool2d(x3)
+
+        x5 = self.encoder_conv_3(x4)       # to be concatenated to decoder
+        x6 = self.MaxPool2d(x5)
+
+        x7 = self.encoder_conv_4(x6)       # to be concatenated to decoder
+        x = self.ConvT2D_2(x7)
+
+        x = self.decoder_conv_2(torch.cat([x, x5], 1))
+
+        x = self.ConvT2D_3(x)
+        x = self.decoder_conv_3(torch.cat([x, x3], 1))
+
+        x = self.ConvT2D_4(x)
+
+        x = self.decoder_conv_4(torch.cat([x, x1], 1))
+
+        x = self.final(x)
+        return x
+
+
 if __name__ == "__main__":
     image = torch.rand((1, 3, 300, 300))
-    print(image.size())
-    model = UNetSR()
-    # model = UNet(3, 3)
+    # print(image.size())
+    # model = UNetSR()
+    # model = UNetNoTop()
+    model = UNetD4()
     out = model(image)
-    # print(out.size())
+    print(out.shape)
