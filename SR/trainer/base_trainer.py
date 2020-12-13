@@ -114,32 +114,51 @@ class BaseTrainer:
 
     def _update_loss_plot(self):
         # training loss plot
-        if len(self.train_loss) != 0:
-            self.logger.debug("plot training loss")
-            plt.figure()
-            # plt.plot(list(range(self.start_epoch, self.start_epoch +
-            #                     len(self.train_loss))), self.train_loss)
-            plt.plot(list(range(1, len(self.train_loss) + 1)), self.train_loss)
-            plt.xlabel("epoch")
-            plt.ylabel("loss")
-            plt.title("Training Loss")
-            plt.savefig(self.checkpoint_dir / 'train_loss.png')
-            plt.close()
+        if len(self.train_loss) != 0 and len(self.valid_loss) != 0:
+            self.logger.debug("plot training and validation loss")
+            fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(20, 7))
+            axes[0].plot(list(range(1, len(self.train_loss) + 1)),
+                         self.train_loss)
+            axes[0].set_xlabel("epoch")
+            axes[0].set_ylabel("loss")
+            axes[0].set_title("Training Loss")
+
+            axes[1].plot(list(range(1, len(self.valid_loss) + 1)),
+                         self.valid_loss)
+            axes[1].set_xlabel("epoch")
+            axes[1].set_ylabel("loss")
+            axes[1].set_title("Validation Loss")
+            fig.savefig(self.checkpoint_dir / 'loss.png')
         else:
-            self.logger.error("error: no training loss")
-        if len(self.valid_loss) != 0:
-            self.logger.debug("plot validation loss")
-            plt.figure()
-            # plt.plot(list(range(self.start_epoch, self.start_epoch +
-            #                     len(self.valid_loss))), self.valid_loss)
-            plt.plot(list(range(1, len(self.valid_loss) + 1)), self.valid_loss)
-            plt.xlabel("epoch")
-            plt.ylabel("loss")
-            plt.title("Validation Loss")
-            plt.savefig(self.checkpoint_dir / 'valid_loss.png')
-            plt.close()
-        else:
-            self.logger.error("error: no validation loss")
+            # training loss or validation loss is missing, cannot save both loss in to the same image
+            if len(self.train_loss) != 0:
+                self.logger.debug("plot training loss")
+                plt.figure()
+                # plt.plot(list(range(self.start_epoch, self.start_epoch +
+                #                     len(self.train_loss))), self.train_loss)
+                plt.plot(list(range(1, len(self.train_loss) + 1)),
+                         self.train_loss)
+                plt.xlabel("epoch")
+                plt.ylabel("loss")
+                plt.title("Training Loss")
+                plt.savefig(self.checkpoint_dir / 'train_loss.png')
+                plt.close()
+            else:
+                self.logger.error("error: no training loss")
+            if len(self.valid_loss) != 0:
+                self.logger.debug("plot validation loss")
+                plt.figure()
+                # plt.plot(list(range(self.start_epoch, self.start_epoch +
+                #                     len(self.valid_loss))), self.valid_loss)
+                plt.plot(list(range(1, len(self.valid_loss) + 1)),
+                         self.valid_loss)
+                plt.xlabel("epoch")
+                plt.ylabel("loss")
+                plt.title("Validation Loss")
+                plt.savefig(self.checkpoint_dir / 'valid_loss.png')
+                plt.close()
+            else:
+                self.logger.error("error: no validation loss")
 
     def _save_checkpoint(self, epoch):
         torch.save(self.model.state_dict(), os.path.join(

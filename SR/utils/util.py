@@ -8,16 +8,26 @@ import nvgpu
 import psutil
 import pathlib
 from datetime import timedelta
+from torchvision.transforms import ToTensor
 
 
 def format_time(elapsed_time):
+    """format time"""
     elapsed_time_rounded = int(round(elapsed_time))
     return str(timedelta(seconds=elapsed_time_rounded))
 
 
 def get_lr(optimizer):
+    """Get learning rate from optimizer"""
     for param_group in optimizer.param_groups:
         return param_group['lr']
+
+
+def psnr_PIL(output, target):
+    """output and target are both PIL Image"""
+    output_tensor = ToTensor()(output)
+    target_tensor = ToTensor()(target)
+    return psnr(output_tensor, target_tensor)
 
 
 def psnr(outputs, targets):

@@ -55,6 +55,12 @@ def run(models: List[nn.Module], configs: List[dict]):
         for key in config:
             logger.info(f"{key}: {config[key]}")
         logger.info(get_divider_str("Configuration Parameters End"))
+        if config['test_only']:
+            logger.info(
+                "test_only is True, skip training and produce test images")
+            run_test(config, logger, model)
+            continue
+
         optimizer = config['optimizer']
         if 'scheduler' in config and config['scheduler'] is not None:
             scheduler = lr_scheduler.StepLR(
@@ -99,26 +105,30 @@ def run(models: List[nn.Module], configs: List[dict]):
             continue
 
         ############################################ run test images ############################################
-        try:
-            weight_path = pathlib.Path(config['checkpoint_dir']) / 'weights'
-            weight_files = sorted(os.listdir(weight_path), key=lambda filename: int(
-                re.findall('epoch(\d{1,})\.pth', filename)[0]))
-            if len(weight_files) != 0:
-                logger.info("Running tests")
-                test_all.main(
-                    config['dataset_type'],
-                    config['low_res'],
-                    config['high_res'],
-                    weight_path / weight_files[-1],
-                    config['checkpoint_dir'] /
-                    'test', model.__class__.__name__,
-                    logger=logger,
-                    multiprocess_num_cpu=1 if 'test_all_multiprocess_cpu' in config else config[
-                        'test_all_multiprocess_cpu']
-                )
-        except KeyError as e:
-            error_traceback = traceback.format_exc()
-            logger.error(e)
-            logger.error(error_traceback)
-            logger.error(
-                "Test images failed to generate. Likely your model is not registered in the test_all.py file. Modify the map dictionary called model_map")
+        run_test(config, logger, model)
+
+
+def run_test(config, logger, model):
+    try:
+        weight_path = pathlib.Path(config['checkpoint_dir']) / 'weights'
+        weight_files = sorted(os.listdir(weight_path), key=lambda filename: int(
+            re.findall('epoch(\d{1,})\.pth', filename)[0]))
+        if len(weight_files) != 0:
+            logger.info("Running tests")
+            test_all.main(
+                config['dataset_type'],
+                config['low_res'],
+                config['high_res'],
+                weight_path / weight_files[-1],
+                config['checkpoint_dir'] /
+                'test', model.__class__.__name__,
+                logger=logger,
+                multiprocess_num_cpu=1 if not 'test_all_multiprocess_cpu' in config else config[
+                    'test_all_multiprocess_cpu']
+            )
+    except KeyError as e:
+        error_traceback = traceback.format_exc()
+        logger.error(e)
+        logger.error(error_traceback)
+        logger.error(
+            "Test images failed to generate. Likely your model is not registered in the test_all.py file. Modify the map dictionary called model_map")

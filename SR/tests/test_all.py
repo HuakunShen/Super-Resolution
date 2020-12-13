@@ -15,6 +15,8 @@ from model.FSRCNN import FSRCNN, FSRCNN_Original
 from model.SRCNN import SRCNN
 from model.UNetSR import UNetSR
 from config import DIV2K_DATASET_PATH
+from utils.util import psnr, psnr_PIL
+
 
 """
 Example:
@@ -42,13 +44,19 @@ class Saver():
         assert lr_image_path.exists() and hr_image_path.exists()
         lr_image, hr_image = PIL.Image.open(
             lr_image_path), PIL.Image.open(hr_image_path)
-        fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(60, 20))
+        fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(30, 10))
         computed_image = transforms.ToPILImage()(
             self.model(transforms.ToTensor()(lr_image).unsqueeze(0)).squeeze(0))
         axes[0].imshow(lr_image.resize(hr_image.size),
-                       resample=PIL.Image.BICUBIC)
-        axes[1].imshow(computed_image)
-        axes[2].imshow(hr_image)
+                       resample=PIL.Image.BICUBIC)      # low resolution image after scaling up
+        axes[0].set_title(
+            f"Low Res (PSNR: {round(float(psnr_PIL(lr_image, hr_image)), 2)})")
+        axes[1].imshow(computed_image)                  # generated image
+        axes[1].set_title(
+            f"Generated (PSNR: {round(float(psnr_PIL(computed_image, hr_image)), 2)})")
+        axes[2].imshow(hr_image)                        # high resolution image
+        axes[2].set_title(
+            f"High Res (PSNR: {round(float(psnr_PIL(hr_image, hr_image)), 2)})")
         for i in range(3):
             axes[i].axis('off')
         lr_image.close()
@@ -65,7 +73,8 @@ def main(type_, lr_size, hr_size, weight_path, output_path, model_name,  logger:
     hr_size: {hr_size}
     weight_path: {weight_path}
     output_path: {output_path}
-    model_name: {model_name}
+    model_name: {model_name},
+    multiprocess_num_cpu: {multiprocess_num_cpu}
     """)
     weight_path = pathlib.Path(weight_path)
     output_path = pathlib.Path(output_path)
