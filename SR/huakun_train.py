@@ -7,6 +7,8 @@ from trainer import train
 from config import SR_PATH
 from model.UNetSR import UNetNoTop, UNetD4
 from model.SRCNN import SRCNN
+from utils.loss import FeatureExtractor, LossSum
+
 
 if __name__ == '__main__':
     if torch.cuda.is_available():
@@ -16,24 +18,22 @@ if __name__ == '__main__':
     # Below is the configuration you need to set
     ###################################################################################################################
     srcnn = SRCNN().to(device)
+    fe = FeatureExtractor().to(device)
+    criterion = LossSum(fe)
     srcnn_config = {
         'epochs': 30,
         'save_period': 5,
         'batch_size': 20,
-        'checkpoint_dir': SR_PATH / 'result/srcnn_new_framework',
+        'checkpoint_dir': SR_PATH / 'result/srcnn_100_300_perceptual_loss',
         'log_step': 10,
         'start_epoch': 1,
-        'criterion': nn.MSELoss(),
+        'criterion': criterion,
         'dataset_type': 'same_300',
         'low_res': 100,
         'high_res': 300,
-        # 'learning_rate': 0.003,
         'device': device,
-        'scheduler': {
-            'step_size': 5,
-            'gamma': 0.7
-        },
-        'optimizer': optim.Adam(srcnn.parameters(), lr=0.005),
+        'scheduler': None,
+        'optimizer': optim.Adam(srcnn.parameters(), lr=0.001),
         'train_set_percentage': 0.9,
         'num_worker': multiprocessing.cpu_count(),
         'test_all_multiprocess_cpu': 1
@@ -85,8 +85,8 @@ if __name__ == '__main__':
         'num_worker': multiprocessing.cpu_count(),
         'test_all_multiprocess_cpu': 1
     }
-    # models = [srcnn, unetNoTop, unetD4]
-    # configs = [srcnn_config, unetNoTop_config, unetD4_config]
+    # models = [unetNoTop, unetD4]
+    # configs = [unetNoTop_config, unetD4_config]
     models = [srcnn]
     configs = [srcnn_config]
 

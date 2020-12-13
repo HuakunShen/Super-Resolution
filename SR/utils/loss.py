@@ -37,7 +37,8 @@ def loss_sum(output, target, fe: FeatureExtractor, perceptual_ratio=0.005):
 
         loss = mse(output, target)
         for i in range(len(output_features)):
-            loss += perceptual_ratio * mse(output_features[i], target_features[i])
+            loss += perceptual_ratio * \
+                mse(output_features[i], target_features[i])
         return loss
 
 
@@ -49,11 +50,21 @@ class LossSum:
     def __call__(self, output, target):
         mse = nn.MSELoss()
         self.feature_extractor.eval()
-        with torch.no_grad():
-            output_features = self.feature_extractor(output)
-            target_features = self.feature_extractor(target)
-            loss = mse(output, target)
-            for i in range(len(output_features)):
-                loss += self.perceptual_ratio * mse(output_features[i], target_features[i])
-            return loss
+        # with torch.no_grad():
+        output_features = self.feature_extractor(output)
+        target_features = self.feature_extractor(target)
+        loss = mse(output, target)
+        for i in range(len(output_features)):
+            loss += self.perceptual_ratio * \
+                mse(output_features[i], target_features[i])
+        return loss
 
+
+if __name__ == "__main__":
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    img1 = torch.rand((1, 3, 300, 300)).to(device)
+    img2 = torch.rand((1, 3, 300, 300)).to(device)
+    print(img1)
+    fe = FeatureExtractor().to(device)
+    criterion = LossSum(fe)
+    print(criterion(img1, img2))
