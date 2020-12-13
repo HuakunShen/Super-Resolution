@@ -15,7 +15,7 @@ from model.FSRCNN import FSRCNN, FSRCNN_Original
 from model.SRCNN import SRCNN
 from model.UNetSR import UNetSR
 from config import DIV2K_DATASET_PATH
-from utils.util import psnr, psnr_PIL
+from utils.util import psnr, psnr_PIL, load_checkpoint_state
 
 
 """
@@ -89,6 +89,9 @@ def main(type_, lr_size, hr_size, weight_path, output_path, model_name,  logger:
     ) and valid_lr.exists() and valid_hr.exists()
 
     model.load_state_dict(torch.load(weight_path))
+    checkpoint_state = load_checkpoint_state(weight_path)
+    state = load_checkpoint_state(weight_path)
+    model.load_state_dict(state['state_dict'])
     model.eval()
     image_names = os.listdir(valid_lr)
 

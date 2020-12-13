@@ -5,7 +5,7 @@ import torch
 import pathlib
 import logging
 from tqdm import tqdm
-from utils.util import get_divider_str
+from utils.util import get_divider_str, save_checkpoint_state, load_checkpoint_state
 from abc import abstractmethod
 import matplotlib.pyplot as plt
 from logger.memory_profile import MemoryProfiler
@@ -34,8 +34,8 @@ class BaseTrainer:
         self.valid_results = self.checkpoint_dir / 'validation'
         self.log_path = self.checkpoint_dir / 'log.log'
         self.memory_profiler = MemoryProfiler(self.logger)
-        # load valid_loss and train_loss if this is not starting from the beginning
 
+        ################## load valid_loss and train_loss if this is not starting from the beginning ##################
         if self.start_epoch != 1 and not self.checkpoint_dir.exists():
             raise ValueError(
                 "Start Epoch is not 1 but checkpoint directory doesn't exist. Verify your Configurations.")
@@ -63,7 +63,7 @@ class BaseTrainer:
             self.train_loss = []
             self.valid_loss = []
 
-        # # load checkpoint weights if needed
+        ################################# load checkpoint weights if needed #################################
         if not (self.start_epoch <= 1 and self.checkpoint_dir.exists()):
             # load weights
             self.logger.info(
@@ -71,9 +71,13 @@ class BaseTrainer:
             weights_files = os.listdir(self.model_weights_dir)
             if f'epoch{self.start_epoch}.pth' in weights_files:
                 self.logger.info(
-                    f"epoch{self.start_epoch}.pth found, load model weights")
-                self.model.load_state_dict(torch.load(
-                    self.model_weights_dir / f'epoch{self.start_epoch}.pth'))
+                    f"epoch{self.start_epoch}.pth found, load model state")
+                state = load_checkpoint_state(
+                    self.model_weights_dir / f'epoch{self.start_epoch}.pth')
+                self.model.load_state_dict(state['state_dict'])
+                self.optimizer.load_state_dict(state['optimizer'])
+                # self.model.load_state_dict(torch.load(
+                #     self.model_weights_dir / f'epoch{self.start_epoch}.pth'))
                 self.model.eval()
             else:
                 raise ValueError(
@@ -161,5 +165,11 @@ class BaseTrainer:
                 self.logger.error("error: no validation loss")
 
     def _save_checkpoint(self, epoch):
-        torch.save(self.model.state_dict(), os.path.join(
-            self.model_weights_dir, 'epoch{}.pth'.format(epoch)))
+        # save model state
+        checkpoint_state = {
+            'epoch': epoch,
+            'state_dict': self.model.state_dict(),
+            'optimizer': self.optimizer.state_dict()
+        }
+        save_checkpoint_state(state=checkpoint_state, epoch=epoch, is_best=False, checkpoint_dir=os.path.join(
+            self.model_weights_dir))
