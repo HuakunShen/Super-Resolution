@@ -30,15 +30,11 @@ def run(models: List[nn.Module], configs: List[dict]):
         torch.cuda.empty_cache()
         model = models[i]
         config = configs[i]
-        ######################### setup workspace #########################
-        if config['start_epoch'] <= 1 and config["checkpoint_dir"].exists():
-            # not training from a checkpoint
-            shutil.rmtree(config["checkpoint_dir"])
-        ######################### setup logger #########################
+        ################################ setup logger ################################
         config["checkpoint_dir"].mkdir(parents=True, exist_ok=True)
         logger = get_logger(os.path.basename(pathlib.Path(
             config["checkpoint_dir"]).absolute()), config["checkpoint_dir"] / 'log.log')
-        ######################### setup dataset path #########################
+        ############################# setup dataset path #############################
         lr_number, hr_number = config['low_res'], config['high_res']
         train_in_dir, train_label_dir = DIV2K_DATASET_PATH / config['dataset_type'] / \
             f'train_{lr_number}', DIV2K_DATASET_PATH / \
@@ -48,8 +44,7 @@ def run(models: List[nn.Module], configs: List[dict]):
             f'valid_{lr_number}', DIV2K_DATASET_PATH / \
             config['dataset_type'] / \
             f'valid_{hr_number}'
-        # log training dataset info
-        ######################### log training dataset info #########################
+        ########################## log training dataset info ##########################
         logger.info(get_divider_str("Configuration Parameters Start"))
         logger.info(f"training model: {model.__class__}")
         for key in config:
@@ -60,6 +55,10 @@ def run(models: List[nn.Module], configs: List[dict]):
                 "test_only is True, skip training and produce test images")
             run_test(config, logger, model)
             continue
+        ############################### setup workspace ###############################
+        if config['start_epoch'] <= 1 and config["checkpoint_dir"].exists():
+            # not training from a checkpoint
+            shutil.rmtree(config["checkpoint_dir"])
 
         optimizer = config['optimizer']
         if 'scheduler' in config and config['scheduler'] is not None:
