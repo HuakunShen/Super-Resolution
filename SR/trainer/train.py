@@ -30,10 +30,20 @@ def run(models: List[nn.Module], configs: List[dict]):
         torch.cuda.empty_cache()
         model = models[i]
         config = configs[i]
+        ############################### setup workspace ##############################
+        if config['start_epoch'] <= 1 and config["checkpoint_dir"].exists() and not config['test_only']:
+            # not training from a checkpoint
+            shutil.rmtree(config["checkpoint_dir"])
         ################################ setup logger ################################
         config["checkpoint_dir"].mkdir(parents=True, exist_ok=True)
         logger = get_logger(os.path.basename(pathlib.Path(
             config["checkpoint_dir"]).absolute()), config["checkpoint_dir"] / 'log.log')
+        ################################## test only #################################
+        if config['test_only']:
+            logger.info(
+                "test_only is True, skip training and produce test images")
+            run_test(config, logger, model)
+            continue
         ############################# setup dataset path #############################
         lr_number, hr_number = config['low_res'], config['high_res']
         train_in_dir, train_label_dir = DIV2K_DATASET_PATH / config['dataset_type'] / \
@@ -50,15 +60,6 @@ def run(models: List[nn.Module], configs: List[dict]):
         for key in config:
             logger.info(f"{key}: {config[key]}")
         logger.info(get_divider_str("Configuration Parameters End"))
-        if config['test_only']:
-            logger.info(
-                "test_only is True, skip training and produce test images")
-            run_test(config, logger, model)
-            continue
-        ############################### setup workspace ###############################
-        if config['start_epoch'] <= 1 and config["checkpoint_dir"].exists():
-            # not training from a checkpoint
-            shutil.rmtree(config["checkpoint_dir"])
 
         optimizer = config['optimizer']
         if 'scheduler' in config and config['scheduler'] is not None:
