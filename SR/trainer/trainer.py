@@ -27,6 +27,7 @@ class Trainer(BaseTrainer):
         # number of batches in dataloader
         self.len_epoch = len(self.train_dataloader)
         self.log_step = config['log_step']
+        self.best_valid_loss = float('inf')
 
     def _train_epoch(self, epoch):
         """
@@ -57,7 +58,12 @@ class Trainer(BaseTrainer):
 
         # do validation
         valid_loss = self._valid_epoch(epoch) if self.do_validation else None
+        if valid_loss < self.best_valid_loss:
+            # new best weights
+            self.best_valid_loss = valid_loss
+
         self.valid_loss.append(valid_loss)
+        self.learning_rates.append(get_lr(self.optimizer))
         if self.lr_scheduler is not None:
             self.lr_scheduler.step()
         return {'valid_loss': valid_loss}
@@ -119,3 +125,5 @@ class Trainer(BaseTrainer):
             plt.close()
         np.savetxt(self.checkpoint_dir / 'valid_loss.txt', self.valid_loss)
         np.savetxt(self.checkpoint_dir / 'train_loss.txt', self.train_loss)
+        np.savetxt(self.checkpoint_dir /
+                   'learning_rates.txt', self.learning_rates)

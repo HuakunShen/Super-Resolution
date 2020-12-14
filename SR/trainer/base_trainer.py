@@ -34,25 +34,28 @@ class BaseTrainer:
         self.valid_results = self.checkpoint_dir / 'validation'
         self.log_path = self.checkpoint_dir / 'log.log'
         self.memory_profiler = MemoryProfiler(self.logger)
-
         ################## load valid_loss and train_loss if this is not starting from the beginning ##################
         if self.start_epoch != 1 and not self.checkpoint_dir.exists():
             raise ValueError(
                 "Start Epoch is not 1 but checkpoint directory doesn't exist. Verify your Configurations.")
         if self.start_epoch != 1 and self.checkpoint_dir.exists():
             self.logger.info("loadding loss files with numpy")
-            self.train_loss = list(np.loadtxt(
-                self.checkpoint_dir / 'valid_loss.txt'))
-            self.valid_loss = list(np.loadtxt(
-                self.checkpoint_dir / 'train_loss.txt'))
+            self.train_loss = np.loadtxt(
+                self.checkpoint_dir / 'valid_loss.txt')
+            self.valid_loss = np.loadtxt(
+                self.checkpoint_dir / 'train_loss.txt')
+            self.learning_rates = np.loadtxt(
+                self.checkpoint_dir / 'learning_rates.txt')
             if len(self.train_loss) < self.start_epoch or len(self.valid_loss) < self.start_epoch:
                 raise ValueError(
                     f'There is not enough loss in previous loss files.\n'
                     f'Start Epoch={self.start_epoch}, train_loss length={len(self.train_loss)}, '
                     f'valid_loss length={len(self.valid_loss)}')
             else:
-                self.train_loss = self.train_loss[:self.start_epoch]
-                self.valid_loss = self.valid_loss[:self.start_epoch]
+                self.train_loss = list(self.train_loss[:self.start_epoch])
+                self.valid_loss = list(self.valid_loss[:self.start_epoch])
+                self.learning_rates = list(
+                    self.learning_rates[:self.start_epoch])
             self.logger.info(
                 f'loaded training loss from previous train (length={len(self.train_loss)}):')
             self.logger.debug(self.train_loss)
@@ -62,7 +65,7 @@ class BaseTrainer:
         else:
             self.train_loss = []
             self.valid_loss = []
-
+            self.learning_rates = []
         ################################# load checkpoint weights if needed #################################
         if not (self.start_epoch <= 1 and self.checkpoint_dir.exists()):
             # load weights
@@ -118,6 +121,8 @@ class BaseTrainer:
 
     def _update_loss_plot(self):
         # training loss plot
+        np.savetxt(self.checkpoint_dir / 'valid_loss.txt', self.valid_loss)
+        np.savetxt(self.checkpoint_dir / 'train_loss.txt', self.train_loss)
         if len(self.train_loss) != 0 and len(self.valid_loss) != 0:
             self.logger.debug("plot training and validation loss")
             fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(20, 7))
@@ -133,13 +138,12 @@ class BaseTrainer:
             axes[1].set_ylabel("loss")
             axes[1].set_title("Validation Loss")
             fig.savefig(self.checkpoint_dir / 'loss.png')
+            plt.close()
         else:
             # training loss or validation loss is missing, cannot save both loss in to the same image
             if len(self.train_loss) != 0:
                 self.logger.debug("plot training loss")
                 plt.figure()
-                # plt.plot(list(range(self.start_epoch, self.start_epoch +
-                #                     len(self.train_loss))), self.train_loss)
                 plt.plot(list(range(1, len(self.train_loss) + 1)),
                          self.train_loss)
                 plt.xlabel("epoch")
@@ -152,8 +156,6 @@ class BaseTrainer:
             if len(self.valid_loss) != 0:
                 self.logger.debug("plot validation loss")
                 plt.figure()
-                # plt.plot(list(range(self.start_epoch, self.start_epoch +
-                #                     len(self.valid_loss))), self.valid_loss)
                 plt.plot(list(range(1, len(self.valid_loss) + 1)),
                          self.valid_loss)
                 plt.xlabel("epoch")
@@ -163,6 +165,16 @@ class BaseTrainer:
                 plt.close()
             else:
                 self.logger.error("error: no validation loss")
+        if len(self.learning_rates) != 0:
+            plt.figure()
+            plt.plot(list(range(1, len(self.learning_rates) + 1)),
+                     self.learning_rates)
+            plt.xlabel("epoch")
+            plt.ylabel("learning rates")
+            plt.title("Learning Rates")
+            plt.close()
+            np.savetxt(self.checkpoint_dir /
+                       'learning_rates.txt', self.learning_rates)
 
     def _save_checkpoint(self, epoch):
         # save model state
