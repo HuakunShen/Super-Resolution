@@ -74,7 +74,7 @@ class BaseTrainer:
             weights_files = os.listdir(self.model_weights_dir)
             if f'epoch{self.start_epoch}.pth' in weights_files:
                 self.logger.info(
-                    f"epoch{self.start_epoch}.pth found, load model state")
+                    f"epoch{self.start_epoch}.pth found, load model state. Will start training epoch {self.start_epoch + 1}")
                 state = load_checkpoint_state(
                     self.model_weights_dir / f'epoch{self.start_epoch}.pth')
                 self.model.load_state_dict(state['state_dict'])
@@ -87,6 +87,9 @@ class BaseTrainer:
                     f"Weight file not found, the start epoch is {self.start_epoch}, epoch{self.start_epoch}.pth doesn't exist in {self.model_weights_dir}")
         for path in [self.checkpoint_dir, self.model_weights_dir, self.valid_results]:
             path.mkdir(parents=True, exist_ok=True)
+
+        # actually start from next epoch as start_epoch has been trained already
+        self.start_epoch += 1
 
     @abstractmethod
     def _train_epoch(self, epoch):
