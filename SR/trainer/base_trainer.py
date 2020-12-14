@@ -89,7 +89,8 @@ class BaseTrainer:
             path.mkdir(parents=True, exist_ok=True)
 
         # actually start from next epoch as start_epoch has been trained already
-        self.start_epoch += 1
+        if self.start_epoch != 1:
+            self.start_epoch += 1
 
     @abstractmethod
     def _train_epoch(self, epoch):

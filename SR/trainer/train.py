@@ -111,7 +111,9 @@ def run(models: List[nn.Module], configs: List[dict]):
 def run_test(config, logger, model):
     try:
         weight_path = pathlib.Path(config['checkpoint_dir']) / 'weights'
-        weight_files = sorted(os.listdir(weight_path), key=lambda filename: int(
+        weight_files = list(filter(lambda filename: re.match(
+            'epoch(\d{1,})\.pth', filename), os.listdir(weight_path)))
+        weight_files = sorted(weight_files, key=lambda filename: int(
             re.findall('epoch(\d{1,})\.pth', filename)[0]))
         if len(weight_files) != 0:
             logger.info("Running tests")

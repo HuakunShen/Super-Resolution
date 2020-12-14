@@ -21,55 +21,55 @@ if __name__ == '__main__':
     ###################################################################################################################
     fe = FeatureExtractor().to(device)
     criterion = LossSum(fe)
-    srcnn = SRCNN().to(device)
-    srcnn_config = {
-        'epochs': 50,
-        'save_period': 10,
-        'batch_size': 10,
-        'checkpoint_dir': RESULT_PATH / 'result/srcnn_100_300_perceptual_loss_2',
-        'log_step': 10,
-        'start_epoch': 1,
-        'criterion': criterion,
-        'dataset_type': 'same_300',
-        'low_res': 100,
-        'high_res': 300,
-        'device': device,
-        'scheduler': {
-            'step_size': 8,
-            'gamma': 0.6
-        },
-        'optimizer': optim.Adam(srcnn.parameters(), lr=0.003),
-        'train_set_percentage': 0.9,
-        'num_worker': multiprocessing.cpu_count(),
-        'test_all_multiprocess_cpu': 1,
-        'test_only': False
-    }
+    # srcnn = SRCNN().to(device)
+    # srcnn_config = {
+    #     'epochs': 50,
+    #     'save_period': 10,
+    #     'batch_size': 10,
+    #     'checkpoint_dir': RESULT_PATH / 'result/srcnn_100_300_perceptual_loss_2',
+    #     'log_step': 10,
+    #     'start_epoch': 1,
+    #     'criterion': criterion,
+    #     'dataset_type': 'same_300',
+    #     'low_res': 100,
+    #     'high_res': 300,
+    #     'device': device,
+    #     'scheduler': {
+    #         'step_size': 8,
+    #         'gamma': 0.6
+    #     },
+    #     'optimizer': optim.Adam(srcnn.parameters(), lr=0.003),
+    #     'train_set_percentage': 0.9,
+    #     'num_worker': multiprocessing.cpu_count(),
+    #     'test_all_multiprocess_cpu': 1,
+    #     'test_only': False
+    # }
 
-    unetsr = UNetSR(in_c=3, out_c=3).to(device)
+    unetsr = UNetSR(in_c=3, out_c=3, output_paddings=[1, 1]).to(device)
     unet_config = {
-        'epochs': 50,
+        'epochs': 150,
         'save_period': 10,
-        'batch_size': 5,
-        'checkpoint_dir': RESULT_PATH / 'result/unetsr_100_300_perceptual_loss',
+        'batch_size': 8,
+        'checkpoint_dir': RESULT_PATH / 'result/unetsr_100_300_perceptual_loss_w_seed',
         'log_step': 10,
-        'start_epoch': 1,
+        'start_epoch': 100,
         'criterion': criterion,
         'dataset_type': 'same_300',
         'low_res': 100,
         'high_res': 300,
         'device': device,
         'scheduler': {
-            'step_size': 8,
-            'gamma': 0.6
+            'step_size': 5,
+            'gamma': 0.85
         },
-        'optimizer': optim.Adam(unetsr.parameters(), lr=0.003),
+        'optimizer': optim.Adam(unetsr.parameters(), lr=0.002),
         'train_set_percentage': 0.9,
         'num_worker': multiprocessing.cpu_count(),
         'test_all_multiprocess_cpu': 1,
         'test_only': False
     }
-    models = [srcnn, unetsr]
-    configs = [srcnn_config, unet_config]
+    models = [unetsr]
+    configs = [unet_config]
     # models = [unetsr]
     # configs = [unet_config]
 
