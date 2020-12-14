@@ -41,9 +41,9 @@ class BaseTrainer:
         if self.start_epoch != 1 and self.checkpoint_dir.exists():
             self.logger.info("loadding loss files with numpy")
             self.train_loss = np.loadtxt(
-                self.checkpoint_dir / 'valid_loss.txt')
-            self.valid_loss = np.loadtxt(
                 self.checkpoint_dir / 'train_loss.txt')
+            self.valid_loss = np.loadtxt(
+                self.checkpoint_dir / 'valid_loss.txt')
             self.learning_rates = np.loadtxt(
                 self.checkpoint_dir / 'learning_rates.txt')
             if len(self.train_loss) < self.start_epoch or len(self.valid_loss) < self.start_epoch:
