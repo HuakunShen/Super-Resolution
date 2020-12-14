@@ -176,12 +176,12 @@ class BaseTrainer:
             np.savetxt(self.checkpoint_dir /
                        'learning_rates.txt', self.learning_rates)
 
-    def _save_checkpoint(self, epoch):
+    def _save_checkpoint(self, epoch, is_best=False):
         # save model state
         checkpoint_state = {
             'epoch': epoch,
             'state_dict': self.model.state_dict(),
             'optimizer': self.optimizer.state_dict()
         }
-        save_checkpoint_state(state=checkpoint_state, epoch=epoch, is_best=False, checkpoint_dir=os.path.join(
+        save_checkpoint_state(state=checkpoint_state, epoch=epoch, is_best=is_best, checkpoint_dir=os.path.join(
             self.model_weights_dir))

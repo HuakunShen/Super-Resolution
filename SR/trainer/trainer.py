@@ -1,3 +1,4 @@
+import os
 import PIL
 import torch
 from tqdm import tqdm
@@ -7,7 +8,7 @@ from trainer.base_trainer import BaseTrainer
 import matplotlib.pyplot as plt
 from utils.util import get_divider_str
 import numpy as np
-from utils.util import get_lr
+from utils.util import get_lr, load_checkpoint_state, save_checkpoint_state
 
 
 class Trainer(BaseTrainer):
@@ -60,8 +61,10 @@ class Trainer(BaseTrainer):
         valid_loss = self._valid_epoch(epoch) if self.do_validation else None
         if valid_loss < self.best_valid_loss:
             # new best weights
+            self.logger.debug(
+                f"Best validation loss so far. validation loss={valid_loss}. Save state at epoch={epoch}")
             self.best_valid_loss = valid_loss
-
+            super(Trainer, self)._save_checkpoint(epoch, is_best=True)
         self.valid_loss.append(valid_loss)
         self.learning_rates.append(get_lr(self.optimizer))
         if self.lr_scheduler is not None:

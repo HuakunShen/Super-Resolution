@@ -52,11 +52,14 @@ def get_divider_str(msg: str, length: int = 100):
 
 def save_checkpoint_state(state, epoch: int, is_best, checkpoint_dir: pathlib.Path):
     checkpoint_dir = pathlib.Path(checkpoint_dir)
-    f_path = checkpoint_dir / f'epoch{epoch}.pth'
-    torch.save(state, f_path)
+
     if is_best:
         best_fpath = checkpoint_dir / 'best.pth'
-        shutil.copyfile(f_path, best_fpath)
+        # shutil.copyfile(f_path, best_fpath)
+        torch.save(state, best_fpath)
+    else:
+        f_path = checkpoint_dir / f'epoch{epoch}.pth'
+        torch.save(state, f_path)
 
 
 def load_checkpoint_state(checkpoint_fpath):
