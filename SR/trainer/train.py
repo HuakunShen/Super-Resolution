@@ -72,7 +72,7 @@ def run(models: List[nn.Module], configs: List[dict]):
         num_train = int(config['train_set_percentage'] * len(dataset))
         num_valid = int(len(dataset) - num_train)
         train_set, valid_set = torch.utils.data.random_split(
-            dataset, [num_train, num_valid])
+            dataset, [num_train, num_valid], generator=torch.Generator().manual_seed(420))
         train_loader = DataLoader(
             dataset=train_set, batch_size=config['batch_size'],
             shuffle=True, num_workers=config['num_worker'],
