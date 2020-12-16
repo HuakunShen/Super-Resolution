@@ -66,7 +66,7 @@ class Saver():
         plt.close()
 
 
-def main(type_, lr_size, hr_size, weight_path, output_path, model_name,  logger: logging.Logger, multiprocess_num_cpu: int = 1):
+def main(type_, lr_size, hr_size, weight_path, dataset_path, output_path, model_name,  logger: logging.Logger, multiprocess_num_cpu: int = 1):
     logger.info(f"""
     running test all with
     type: {type_}
@@ -83,10 +83,10 @@ def main(type_, lr_size, hr_size, weight_path, output_path, model_name,  logger:
     if output_path.exists():
         shutil.rmtree(output_path)
     output_path.mkdir(parents=True, exist_ok=False)
-    image_dir = DIV2K_DATASET_PATH / type_
+    image_dir = dataset_path / type_
     valid_lr = image_dir / f'valid_{lr_size}'
     valid_hr = image_dir / f'valid_{hr_size}'
-    assert DIV2K_DATASET_PATH.exists() and image_dir.exists(
+    assert dataset_path.exists() and image_dir.exists(
     ) and valid_lr.exists() and valid_hr.exists()
 
     state = load_checkpoint_state(weight_path)

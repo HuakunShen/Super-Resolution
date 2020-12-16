@@ -122,6 +122,7 @@ def run_test(config, logger, model):
                 config['low_res'],
                 config['high_res'],
                 weight_path / weight_files[-1],
+                config['dataset'],
                 config['checkpoint_dir'] /
                 'test', model.__class__.__name__,
                 logger=logger,

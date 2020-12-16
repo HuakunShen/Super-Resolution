@@ -46,33 +46,35 @@ if __name__ == '__main__':
     #     'test_only': False
     # }
 
-    # unetsr = UNetSR(in_c=3, out_c=3, output_paddings=[1, 0]).to(device)
-    unetd4 = UNetD4(in_c=3, out_c=3).to(device)
+    unetsr = UNetSR(in_c=3, out_c=3, output_paddings=[1, 1]).to(device)
+    # unetd4 = UNetD4(in_c=3, out_c=3).to(device)
     unet_config = {
-        'epochs': 2,
+        'epochs': 50,
         'save_period': 10,
         'batch_size': 10,
-        'checkpoint_dir': RESULT_PATH / 'result' / 'TEXT' / 'resize-75-300-4x',
-        'log_step': 10,
+        'checkpoint_dir': RESULT_PATH / 'result' / 'TEXT' / 'unetd4-blur-3',
+        'log_step': 5,
         'start_epoch': 1,
         'criterion': criterion,
         'dataset': TEXT_DATASET_PATH,
         'dataset_type': 'same',
-        'low_res': 'Resize75x75',
+        # 'low_res': 'Resize50x50',
+        # 'high_res': 'Target300x300',
+        'low_res': 'BlurRadius3',
         'high_res': 'Target300x300',
         'device': device,
         'scheduler': {
             'step_size': 5,
-            'gamma': 0.9
+            'gamma': 0.8
         },
         # 'scheduler': None,
-        'optimizer': optim.Adam(unetd4.parameters(), lr=0.002),
+        'optimizer': optim.Adam(unetsr.parameters(), lr=0.002),
         'train_set_percentage': 0.9,
         'num_worker': multiprocessing.cpu_count(),
         'test_all_multiprocess_cpu': 1,
         'test_only': False
     }
-    models = [unetd4]
+    models = [unetsr]
     configs = [unet_config]
     # models = [unetsr]
     # configs = [unet_config]

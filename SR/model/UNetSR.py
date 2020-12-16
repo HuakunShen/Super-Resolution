@@ -6,11 +6,11 @@ from torchvision import transforms
 import torch.nn.functional as F
 
 
-def double_convolution(in_c, out_c):
+def double_convolution(in_c, out_c, ksize=3):
     return nn.Sequential(
-        nn.Conv2d(in_c, out_c, kernel_size=3, padding=3//2),
+        nn.Conv2d(in_c, out_c, kernel_size=ksize, padding=ksize//2),
         nn.ReLU(inplace=True),
-        nn.Conv2d(out_c, out_c, kernel_size=3, padding=3//2),
+        nn.Conv2d(out_c, out_c, kernel_size=ksize, padding=ksize//2),
         nn.ReLU(inplace=True),
     )
 
@@ -43,29 +43,29 @@ class UNetSR(nn.Module):
 
     """
 
-    def __init__(self, in_c: int = 3, out_c: int = 3, output_paddings=[1, 1]):
+    def __init__(self, in_c: int = 3, out_c: int = 3, ksize=3, output_paddings=[1, 1]):
         """output_paddings: second number is 0 when input size is 600, 1 if input size is 300"""
         super(UNetSR, self).__init__()
         self.MaxPool2d = nn.MaxPool2d(kernel_size=2, stride=2)
         # encoder part
-        self.encoder_conv_1 = double_convolution(in_c, 64)
-        self.encoder_conv_2 = double_convolution(64, 128)
-        self.encoder_conv_3 = double_convolution(128, 256)
-        self.encoder_conv_4 = double_convolution(256, 512)
-        self.encoder_conv_5 = double_convolution(512, 1024)
+        self.encoder_conv_1 = double_convolution(in_c, 64, ksize=ksize)
+        self.encoder_conv_2 = double_convolution(64, 128, ksize=ksize)
+        self.encoder_conv_3 = double_convolution(128, 256, ksize=ksize)
+        self.encoder_conv_4 = double_convolution(256, 512, ksize=ksize)
+        self.encoder_conv_5 = double_convolution(512, 1024, ksize=ksize)
         # decoder part
         self.ConvT2D_1 = nn.ConvTranspose2d(
             in_channels=1024, out_channels=512, kernel_size=2, stride=2, output_padding=output_paddings[0])
-        self.decoder_conv_1 = double_convolution(1024, 512)
+        self.decoder_conv_1 = double_convolution(1024, 512, ksize=ksize)
         self.ConvT2D_2 = nn.ConvTranspose2d(
             in_channels=512, out_channels=256, kernel_size=2, stride=2, output_padding=output_paddings[1])
-        self.decoder_conv_2 = double_convolution(512, 256)
+        self.decoder_conv_2 = double_convolution(512, 256, ksize=ksize)
         self.ConvT2D_3 = nn.ConvTranspose2d(
             in_channels=256, out_channels=128, kernel_size=2, stride=2)
-        self.decoder_conv_3 = double_convolution(256, 128)
+        self.decoder_conv_3 = double_convolution(256, 128, ksize=ksize)
         self.ConvT2D_4 = nn.ConvTranspose2d(
             in_channels=128, out_channels=64, kernel_size=2, stride=2)
-        self.decoder_conv_4 = double_convolution(128, 64)
+        self.decoder_conv_4 = double_convolution(128, 64, ksize=ksize)
         # output layer to 3 channels
         self.final = nn.Conv2d(64, out_c, kernel_size=1)
 
@@ -121,28 +121,28 @@ class UNetNoTop(nn.Module):
     remove top layer skip connection
     """
 
-    def __init__(self, in_c: int = 3, out_c: int = 3):
+    def __init__(self, in_c: int = 3, out_c: int = 3, ksize=3):
         super(UNetNoTop, self).__init__()
         self.MaxPool2d = nn.MaxPool2d(kernel_size=2, stride=2)
         # encoder part
-        self.encoder_conv_1 = double_convolution(in_c, 64)
-        self.encoder_conv_2 = double_convolution(64, 128)
-        self.encoder_conv_3 = double_convolution(128, 256)
-        self.encoder_conv_4 = double_convolution(256, 512)
-        self.encoder_conv_5 = double_convolution(512, 1024)
+        self.encoder_conv_1 = double_convolution(in_c, 64, ksize=ksize)
+        self.encoder_conv_2 = double_convolution(64, 128, ksize=ksize)
+        self.encoder_conv_3 = double_convolution(128, 256, ksize=ksize)
+        self.encoder_conv_4 = double_convolution(256, 512, ksize=ksize)
+        self.encoder_conv_5 = double_convolution(512, 1024, ksize=ksize)
         # decoder part
         self.ConvT2D_1 = nn.ConvTranspose2d(
             in_channels=1024, out_channels=512, kernel_size=2, stride=2, output_padding=1)
-        self.decoder_conv_1 = double_convolution(1024, 512)
+        self.decoder_conv_1 = double_convolution(1024, 512, ksize=ksize)
         self.ConvT2D_2 = nn.ConvTranspose2d(
             in_channels=512, out_channels=256, kernel_size=2, stride=2, output_padding=1)
-        self.decoder_conv_2 = double_convolution(512, 256)
+        self.decoder_conv_2 = double_convolution(512, 256, ksize=ksize)
         self.ConvT2D_3 = nn.ConvTranspose2d(
             in_channels=256, out_channels=128, kernel_size=2, stride=2)
-        self.decoder_conv_3 = double_convolution(256, 128)
+        self.decoder_conv_3 = double_convolution(256, 128, ksize=ksize)
         self.ConvT2D_4 = nn.ConvTranspose2d(
             in_channels=128, out_channels=64, kernel_size=2, stride=2)
-        self.decoder_conv_4 = double_convolution(64, 64)
+        self.decoder_conv_4 = double_convolution(64, 64, ksize=ksize)
         # output layer to 3 channels
         self.final = nn.Conv2d(64, out_c, kernel_size=1)
 
@@ -174,28 +174,28 @@ class UNetD4(nn.Module):
     UNet depth=4, instead of original 5 layers
     """
 
-    def __init__(self, in_c: int = 3, out_c: int = 3):
+    def __init__(self, in_c: int = 3, out_c: int = 3, ksize=3):
         super(UNetD4, self).__init__()
         self.MaxPool2d = nn.MaxPool2d(kernel_size=2, stride=2)
         # encoder part
-        self.encoder_conv_1 = double_convolution(in_c, 64)
-        self.encoder_conv_2 = double_convolution(64, 128)
-        self.encoder_conv_3 = double_convolution(128, 256)
-        self.encoder_conv_4 = double_convolution(256, 512)
-        self.encoder_conv_5 = double_convolution(512, 1024)
+        self.encoder_conv_1 = double_convolution(in_c, 64, ksize=ksize)
+        self.encoder_conv_2 = double_convolution(64, 128, ksize=ksize)
+        self.encoder_conv_3 = double_convolution(128, 256, ksize=ksize)
+        self.encoder_conv_4 = double_convolution(256, 512, ksize=ksize)
+        self.encoder_conv_5 = double_convolution(512, 1024, ksize=ksize)
         # decoder part
         self.ConvT2D_1 = nn.ConvTranspose2d(
             in_channels=1024, out_channels=512, kernel_size=2, stride=2, output_padding=1)
-        self.decoder_conv_1 = double_convolution(1024, 512)
+        self.decoder_conv_1 = double_convolution(1024, 512, ksize=ksize)
         self.ConvT2D_2 = nn.ConvTranspose2d(
             in_channels=512, out_channels=256, kernel_size=2, stride=2, output_padding=1)
-        self.decoder_conv_2 = double_convolution(512, 256)
+        self.decoder_conv_2 = double_convolution(512, 256, ksize=ksize)
         self.ConvT2D_3 = nn.ConvTranspose2d(
             in_channels=256, out_channels=128, kernel_size=2, stride=2)
-        self.decoder_conv_3 = double_convolution(256, 128)
+        self.decoder_conv_3 = double_convolution(256, 128, ksize=ksize)
         self.ConvT2D_4 = nn.ConvTranspose2d(
             in_channels=128, out_channels=64, kernel_size=2, stride=2)
-        self.decoder_conv_4 = double_convolution(128, 64)
+        self.decoder_conv_4 = double_convolution(128, 64, ksize=ksize)
         # output layer to 3 channels
         self.final = nn.Conv2d(64, out_c, kernel_size=1)
 
