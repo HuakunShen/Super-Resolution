@@ -4,9 +4,10 @@ import multiprocessing
 import torch.optim as optim
 from model.SRCNN import SRCNN
 from trainer import train
-from config import SR_PATH
+from config import SR_PATH, TEXT_DATASET_PATH, DIV2K_DATASET_PATH
 from model.UNetSR import UNetNoTop, UNetD4, UNetSR
 from model.SRCNN import SRCNN
+from model.resnet_sr import ResNetPretrainedDS
 from utils.loss import FeatureExtractor, LossSum
 import pathlib
 
@@ -45,30 +46,33 @@ if __name__ == '__main__':
     #     'test_only': False
     # }
 
-    unetsr = UNetSR(in_c=3, out_c=3, output_paddings=[1, 1]).to(device)
+    # unetsr = UNetSR(in_c=3, out_c=3, output_paddings=[1, 0]).to(device)
+    unetd4 = UNetD4(in_c=3, out_c=3).to(device)
     unet_config = {
-        'epochs': 150,
+        'epochs': 2,
         'save_period': 10,
-        'batch_size': 8,
-        'checkpoint_dir': RESULT_PATH / 'result/unetsr_100_300_perceptual_loss_w_seed',
+        'batch_size': 10,
+        'checkpoint_dir': RESULT_PATH / 'result' / 'TEXT' / 'resize-75-300-4x',
         'log_step': 10,
-        'start_epoch': 100,
+        'start_epoch': 1,
         'criterion': criterion,
-        'dataset_type': 'same_300',
-        'low_res': 100,
-        'high_res': 300,
+        'dataset': TEXT_DATASET_PATH,
+        'dataset_type': 'same',
+        'low_res': 'Resize75x75',
+        'high_res': 'Target300x300',
         'device': device,
         'scheduler': {
             'step_size': 5,
-            'gamma': 0.85
+            'gamma': 0.9
         },
-        'optimizer': optim.Adam(unetsr.parameters(), lr=0.002),
+        # 'scheduler': None,
+        'optimizer': optim.Adam(unetd4.parameters(), lr=0.002),
         'train_set_percentage': 0.9,
         'num_worker': multiprocessing.cpu_count(),
         'test_all_multiprocess_cpu': 1,
         'test_only': False
     }
-    models = [unetsr]
+    models = [unetd4]
     configs = [unet_config]
     # models = [unetsr]
     # configs = [unet_config]

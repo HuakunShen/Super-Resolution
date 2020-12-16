@@ -28,5 +28,5 @@ class SRCNN(nn.Module):
 if __name__ == "__main__":
     model = SRCNN(3)
 
-    img = torch.rand((1, 3, 150, 150))
+    img = torch.rand((1, 3, 600, 600))
     print(model(img).shape)

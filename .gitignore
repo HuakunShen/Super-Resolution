@@ -147,3 +147,5 @@ SR/result
 ._.DS_Store
 
 *.code-workspace
+
+datasets/TEXT/

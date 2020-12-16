@@ -100,6 +100,6 @@ class ResNetPretrainedDSRes(nn.Module):
 
 
 if __name__ == '__main__':
-    img = torch.rand((4, 3, 600, 600))
-    model = ResNetPretrainedSS()
+    img = torch.rand((4, 3, 150, 150))
+    model = ResNetPretrainedDS()
     print(model(img).shape)

@@ -1,7 +1,6 @@
 import os
 import re
 from typing import List
-
 import torch
 import shutil
 import pathlib
@@ -13,7 +12,7 @@ from trainer.trainer import Trainer
 from torchvision import transforms
 from torch.optim import lr_scheduler
 from torch.utils.data import DataLoader
-from dataloader.datasets import DIV2KSquareDataset
+from dataloader.datasets import SRDataset
 from model.FSRCNN import FSRCNN, FSRCNN_Original
 from model.resnet_sr import ResNetPretrainedSS
 from model.SRCNN import SRCNN
@@ -25,11 +24,12 @@ from config import SR_PATH, DIV2K_DATASET_PATH
 
 
 def run(models: List[nn.Module], configs: List[dict]):
-    dataset_class = DIV2KSquareDataset
+    dataset_class = SRDataset
     for i in range(len(models)):
         torch.cuda.empty_cache()
         model = models[i]
         config = configs[i]
+        DATASET_PATH = config['dataset']
         ############################### setup workspace ##############################
         if config['start_epoch'] <= 1 and config["checkpoint_dir"].exists() and not config['test_only']:
             # not training from a checkpoint
@@ -45,15 +45,15 @@ def run(models: List[nn.Module], configs: List[dict]):
             run_test(config, logger, model)
             continue
         ############################# setup dataset path #############################
-        lr_number, hr_number = config['low_res'], config['high_res']
-        train_in_dir, train_label_dir = DIV2K_DATASET_PATH / config['dataset_type'] / \
-            f'train_{lr_number}', DIV2K_DATASET_PATH / \
+        lr_type, hr_type = config['low_res'], config['high_res']
+        train_in_dir, train_label_dir = DATASET_PATH / config['dataset_type'] / \
+            f'train_{lr_type}', DATASET_PATH / \
             config['dataset_type'] / \
-            f'train_{hr_number}'
-        test_in_dir, test_label_dir = DIV2K_DATASET_PATH / config['dataset_type'] / \
-            f'valid_{lr_number}', DIV2K_DATASET_PATH / \
+            f'train_{hr_type}'
+        test_in_dir, test_label_dir = DATASET_PATH / config['dataset_type'] / \
+            f'valid_{lr_type}', DATASET_PATH / \
             config['dataset_type'] / \
-            f'valid_{hr_number}'
+            f'valid_{hr_type}'
         ########################## log training dataset info ##########################
         logger.info(get_divider_str("Configuration Parameters Start"))
         logger.info(f"training model: {model.__class__}")
