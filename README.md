@@ -1,5 +1,7 @@
 # Super Resolution
 
+This repo will be open to public after Dec. 18th 2020 as that's the due date for this project.
+
 ## Prerequisites
 
 Use [requirements.txt](./requirements.txt) to install all dependencies.

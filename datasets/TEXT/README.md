@@ -9,6 +9,17 @@
 - same
   - Different types of images with same size (300x300)
 
+## subcategories
+- BlurRadius3
+- BlurRadius5
+- BlurRadius7
+- Resize100x100
+- Resize150x150
+- Resize25x25
+- Resize50x50
+- Resize75x75
+- Target300x300
+
 ## Scripts
 
 - [split_set.ipynb](./split_set.ipynb): Split original images into training and validation set
