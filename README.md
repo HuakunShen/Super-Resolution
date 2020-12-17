@@ -4,7 +4,9 @@ This repo will be open to public after Dec. 18th 2020 as that's the due date for
 
 ## Prerequisites
 
-Use [requirements.txt](./requirements.txt) to install all dependencies.
+Use [requirements.txt](./requirements.txt) to install all dependencies. (fir anaconda)
+
+`pip install -r requirements.txt`
 
 The pytorch version we are using is **1.7.0** with cuda **11.0**. If you are not using the same cuda driver, please make sure you install the correct version for your OS.
 
