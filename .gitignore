@@ -148,4 +148,9 @@ SR/result
 
 *.code-workspace
 
-datasets/TEXT/
+datasets/TEXT/src
+
+datasets/TEXT/diff
+
+datasets/TEXT/same
+

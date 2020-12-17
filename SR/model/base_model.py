@@ -1,12 +1,13 @@
+"""
+This Class is copied from https://github.com/victoresque/pytorch-template/blob/master/base/base_model.py
+"""
 import torch.nn as nn
 import numpy as np
 from abc import abstractmethod
 
 
 class BaseModel(nn.Module):
-    """
-    Base class for all models
-    """
+    """Base class for all models we create, for the convenience of implementation"""
     @abstractmethod
     def forward(self, *inputs):
         """
