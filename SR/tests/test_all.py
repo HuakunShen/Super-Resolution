@@ -13,7 +13,7 @@ from torchvision import transforms
 from utils.util import get_divider_str
 from model.FSRCNN import FSRCNN, FSRCNN_Original
 from model.SRCNN import SRCNN
-from model.UNetSR import UNetSR, UNetD4
+from model.UNetSR import UNetSR, UNetD4, UNetNoTop
 from config import DIV2K_DATASET_PATH
 from utils.util import psnr, psnr_PIL, load_checkpoint_state
 
@@ -28,7 +28,8 @@ model_map = {
     'FSRCNN_Original': FSRCNN_Original(scale_factor=3, num_channels=3),
     'SRCNN': SRCNN(in_channel=3),
     'UNetSR': UNetSR(in_c=3, out_c=3),
-    'UNetD4': UNetD4()
+    'UNetD4': UNetD4(),
+    'UNetNoTop': UNetNoTop()
 }
 
 
