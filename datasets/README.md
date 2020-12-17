@@ -30,5 +30,5 @@ Super-Resolution
 See each directory for more details:
 
 - [DIV2KCustom](./DIV2K)
-- [TEXT][./TEXT]
+- [TEXT](./TEXT)
 
