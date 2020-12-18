@@ -5,6 +5,7 @@ import torch
 
 class FSRCNN_Original(nn.Module):
     """
+    This class is copied from https://github.com/yjn870/FSRCNN-pytorch/blob/master/models.py
     fsrcnn_original = FSRCNN_Original(scale_factor=3, num_channels=3).to(device)
     cnn_original_config = {
         'epochs': 20,

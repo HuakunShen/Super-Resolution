@@ -15,7 +15,7 @@ After downloading the datasets, unzip them in such pattern in order to use them 
 
 ```
 Super-Resolution
-├── datasets
+└── datasets
     ├── DIV2K
     │   ├── diff
     │   ├── same
