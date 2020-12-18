@@ -57,7 +57,25 @@ Note:
 
 ## Single Image Testing
 
-Use the [test_template.py](./SR/test_template.py) for testing. 
+Use the [test.py](./SR/test.py) for testing. 
 
-The idea is the same as Batch Testing, but with a single image, and you don't need to prepare for the entire dataset (just a single 300x300 image).
+This is a python script that takes in images and a weight file, then output the computed images.
+
+This script supports 3 modes:
+- single image testing
+- batch testing without target image
+- batch testing with target image
+
+```python
+# Example for batch testing with target images
+python test.py --weight model.pth --output test --batch_size 10 --input valid_100 --label valid_300
+
+# Example for batch testing without target images
+python test.py --weight model.pth --output test --batch_size 10 --input valid_100
+
+# Example for single image testing
+python test.py --weight model.pth --output output_file.png --input input_file.png
+```
+
+For the arguments to the python script, use the correct path.
 

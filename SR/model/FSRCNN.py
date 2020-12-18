@@ -90,18 +90,18 @@ class FSRCNN(nn.Module):
         super(FSRCNN, self).__init__()
         tmp = []
         for _ in range(4):
-            tmp.append(nn.Conv2d(12, 12, kernel_size=3, padding=1))
-            tmp.append(nn.PReLU(12))
+            tmp.append(nn.Conv2d(16, 16, kernel_size=3, padding=1))
+            tmp.append(nn.PReLU(16))
 
         self.body = nn.Sequential(
-            nn.Conv2d(3, 56, kernel_size=5, padding=2),
-            nn.PReLU(56),
-            nn.Conv2d(56, 12, kernel_size=1),
-            nn.PReLU(12),
+            nn.Conv2d(3, 64, kernel_size=5, padding=2),
+            nn.PReLU(64),
+            nn.Conv2d(64, 16, kernel_size=1),
+            nn.PReLU(16),
             *tmp,
-            nn.Conv2d(12, 56, kernel_size=1),
-            nn.PReLU(56),
-            nn.ConvTranspose2d(56, 3, kernel_size=9, stride=factor, padding=4,
+            nn.Conv2d(16, 64, kernel_size=1),
+            nn.PReLU(64),
+            nn.ConvTranspose2d(64, 3, kernel_size=9, stride=factor, padding=4,
                                output_padding=factor - 1)
         )
         self._init_weights()

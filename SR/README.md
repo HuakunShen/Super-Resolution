@@ -13,8 +13,8 @@ The entry point is a python training file which you configure and execute for tr
 [train_template.py](./train_template.py) is a template for training.
 - See [Training](#training) for details of training
 
-[test_template.py](./test_template.py) is a template for testing.
-- See [Testing](#testing) for details of testing
+[test.py](./test.py) is a python script for testing.
+- See [Testing](#testing) for more details
 
 By training with SR, the entire training process will be saved
 - A **log.log** file containing all training information including will be generated within the checkpoint directory. It contains all parameters for training, debug & error messages, Peak Memory Usage for GPU and RAM. From this file, you can recreate the training configuration dictionary.
@@ -133,3 +133,22 @@ Optionally, you can change **scheduler**. If **scheduler** is changed to `None`,
 
 ## Testing
 
+There is a [test.py](./test.py) within this directory (SR).
+
+This script supports 3 modes:
+- single image testing
+- batch testing without target image
+- batch testing with target image
+
+```python
+# Example for batch testing with target images
+python test.py --weight model.pth --output test --batch_size 10 --input valid_100 --label valid_300
+
+# Example for batch testing without target images
+python test.py --weight model.pth --output test --batch_size 10 --input valid_100
+
+# Example for single image testing
+python test.py --weight model.pth --output output_file.png --input input_file.png
+```
+
+For the arguments to the python script, use the correct path.
