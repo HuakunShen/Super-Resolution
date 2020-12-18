@@ -17,7 +17,8 @@ if __name__ == '__main__':
         torch.cuda.manual_seed_all(1024)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     RESULT_PATH = pathlib.Path(
-        'D:\\Documents\\CS\\Super-Resolution\\SR\\result')
+        '/home/hacker/Documents/Super-Resolution/result')
+
     ###################################################################################################################
     # Below is the configuration you need to set
     ###################################################################################################################
@@ -55,7 +56,7 @@ if __name__ == '__main__':
         'epochs': 80,
         'save_period': 10,
         'batch_size': 10,
-        'checkpoint_dir': RESULT_PATH / 'TEXT' / 'unetd4-blur-5-perceptual',
+        'checkpoint_dir': RESULT_PATH / 'unetd4-blur-5-perceptual',
         'log_step': 5,
         'start_epoch': 1,
         'criterion': criterion,

@@ -21,7 +21,7 @@ No Target Batch Test
 python test.py -w '/home/hacker/Insync/shenhuakun@outlook.com/OneDrive/UT/4th Year/CSC420/project/Super-Resolution-Results/TEXT/unetd4-blur-7-MSE/model.pth' -i /home/hacker/Documents/Super-Resolution/datasets/TEXT/same/valid_BlurRadius7 -o /home/hacker/Desktop/output
 
 With Target Batch Test
-python test.py -w '/home/hacker/Insync/shenhuakun@outlook.com/OneDrive/UT/4th Year/CSC420/project/Super-Resolution-Results/TEXT/unetd4-blur-7-MSE/model.pth' -i /home/hacker/Documents/Super-Resolution/datasets/TEXT/same/valid_BlurRadius7 -o /home/hacker/Desktop/output -t /home/hacker/Documents/Super-Resolution/datasets/TEXT/same/valid_Target300x300
+python test.py -w '/home/hacker/Insync/shenhuakun@outlook.com/OneDrive/UT/4th Year/CSC420/project/Super-Resolution-Results/TEXT/unetd4-blur-7-MSE/model.pth' -i /home/hacker/Documents/Super-Resolution/datasets/TEXT/same/valid_BlurRadius7 -o /home/hacker/Desktop/output -l /home/hacker/Documents/Super-Resolution/datasets/TEXT/same/valid_Target300x300
 """
 
 # setup logger
@@ -57,14 +57,17 @@ def main_with_target(in_dir, out_dir, label_path, weight_path, batch_size=10):
     image_names = sorted(os.listdir(in_dir))
     low_res_psnr_sum = 0
     computed_psnr_sum = 0
-    dataset = SRDataset(input_dir=in_dir, target_dir=label_path, transform=transforms.ToTensor())
-    dataloader = DataLoader(dataset=dataset, batch_size=batch_size, pin_memory=True)
+    dataset = SRDataset(input_dir=in_dir, target_dir=label_path,
+                        transform=transforms.ToTensor())
+    dataloader = DataLoader(
+        dataset=dataset, batch_size=batch_size, pin_memory=True)
     for batch_idx, (data, target) in enumerate(tqdm(dataloader)):
         data, target = data.to(device), target.to(device)
         output = model(data)
         for i, out in enumerate(output):
             out_name = f"{batch_idx * batch_size + i}.png"
-            input_image = transforms.ToPILImage()(data[i]).resize(target.shape[2:])
+            input_image = transforms.ToPILImage()(
+                data[i]).resize(target.shape[2:])
             computed_img = transforms.ToPILImage()(out)
             label_img = transforms.ToPILImage()(target[i])
             fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(30, 10))
@@ -126,7 +129,8 @@ if __name__ == "__main__":
         "-l", "--label", help="target directory containing target images corresponding to input directory")
     parser.add_argument(
         "-w", "--weight", help="Weight File Path", required=True)
-    parser.add_argument('-b', '--batch_size', type=int, default=10, help="batch size for GPU Running test")
+    parser.add_argument('-b', '--batch_size', type=int,
+                        default=10, help="batch size for GPU Running test")
     args = parser.parse_args()
     in_path = pathlib.Path(args.input).absolute()
     out_path = pathlib.Path(args.output).absolute()
@@ -149,5 +153,6 @@ if __name__ == "__main__":
         if label_path is None:
             main_no_target(in_path, out_path, weight_path)
         else:
-            main_with_target(in_path, out_path, label_path, weight_path, args.batch_size)
+            main_with_target(in_path, out_path, label_path,
+                             weight_path, args.batch_size)
         logger.info(get_divider_str("Done"))
