@@ -125,7 +125,7 @@ const App = () => {
           </div>
           <div className="col text-center">
             <button className="btn btn-primary" onClick={handleConvert}>
-              Convert
+              Super Res It !!!
             </button>
           </div>
           <div className="col uploader-col">
@@ -133,6 +133,9 @@ const App = () => {
           </div>
         </div>
         <br />
+        <strong>
+          Select a Weight File (must correspond to the same input image type)
+        </strong>
         <input
           className="form-control"
           type="file"

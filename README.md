@@ -40,3 +40,15 @@ We prepared 2 types of testing
 - Batch Testing
 
 Both methods require some data preparation. See [how-to-test.md](./how-to-test.md) for more instructions.
+
+## Visualizer
+
+We made a Visualizer Web App for single image Super Resolution.
+
+![image-20201218174628302](web/README.assets/image-20201218174823024.png)
+
+See [web](./web/README.md) for more instructions.
+
+## Demo
+
+There are some demonstration videos for this project on YouTube, see [playlist](https://www.youtube.com/playlist?list=PLUxw2JoWliip9Cin-sho2xMPRpKqa89Tz).

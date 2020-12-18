@@ -1,3 +1,5 @@
+absl-py @ file:///home/conda/feedstock_root/build_artifacts/absl-py_1606235506191/work
+aiohttp @ file:///home/conda/feedstock_root/build_artifacts/aiohttp_1605734406386/work
 alabaster==0.7.12
 anaconda-client==1.7.2
 anaconda-navigator==1.10.0
@@ -8,9 +10,12 @@ argh==0.26.2
 argon2-cffi @ file:///tmp/build/80754af9/argon2-cffi_1596828493937/work
 arrow==0.17.0
 asn1crypto @ file:///tmp/build/80754af9/asn1crypto_1596577642040/work
+astor @ file:///home/conda/feedstock_root/build_artifacts/astor_1593610464257/work
 astroid @ file:///tmp/build/80754af9/astroid_1592495912941/work
 astropy==4.0.2
+astunparse==1.6.3
 async-generator==1.10
+async-timeout==3.0.1
 atomicwrites==1.4.0
 attrs @ file:///tmp/build/80754af9/attrs_1604765588209/work
 autopep8 @ file:///tmp/build/80754af9/autopep8_1596578164842/work
@@ -24,10 +29,12 @@ beautifulsoup4 @ file:///tmp/build/80754af9/beautifulsoup4_1601924105527/work
 bitarray @ file:///tmp/build/80754af9/bitarray_1605065113847/work
 bkcharts==0.2
 bleach @ file:///tmp/build/80754af9/bleach_1600439572647/work
+blinker==1.4
 bokeh @ file:///tmp/build/80754af9/bokeh_1603297833684/work
 boto==2.49.0
 Bottleneck==1.3.2
 brotlipy==0.7.0
+cachetools @ file:///home/conda/feedstock_root/build_artifacts/cachetools_1593420445823/work
 certifi==2020.6.20
 cffi @ file:///tmp/build/80754af9/cffi_1600699146221/work
 chardet==3.0.4
@@ -62,10 +69,16 @@ Flask==1.1.2
 Flask-RESTful==0.3.8
 fsspec @ file:///tmp/build/80754af9/fsspec_1602684995936/work
 future==0.18.2
+gast==0.3.3
 gevent @ file:///tmp/build/80754af9/gevent_1601397537062/work
 glob2==0.7
 gmpy2==2.0.8
+google-auth @ file:///home/conda/feedstock_root/build_artifacts/google-auth_1608136875028/work
+google-auth-oauthlib==0.4.1
+google-pasta==0.2.0
 greenlet @ file:///tmp/build/80754af9/greenlet_1600874013538/work
+grpcio @ file:///home/conda/feedstock_root/build_artifacts/grpcio_1604365522020/work
+gunicorn==20.0.4
 h5py==2.10.0
 HeapDict==1.0.1
 html5lib @ file:///tmp/build/80754af9/html5lib_1593446221756/work
@@ -95,6 +108,7 @@ jupyter-core==4.6.3
 jupyterlab==2.2.6
 jupyterlab-pygments @ file:///tmp/build/80754af9/jupyterlab_pygments_1601490720602/work
 jupyterlab-server @ file:///tmp/build/80754af9/jupyterlab_server_1594164409481/work
+Keras-Preprocessing==1.1.0
 keyring @ file:///tmp/build/80754af9/keyring_1601490835422/work
 kiwisolver @ file:///tmp/build/80754af9/kiwisolver_1604014535162/work
 lazy-object-proxy==1.4.3
@@ -102,6 +116,7 @@ libarchive-c==2.9
 llvmlite==0.34.0
 locket==0.2.0
 lxml @ file:///tmp/build/80754af9/lxml_1603216285000/work
+Markdown @ file:///home/conda/feedstock_root/build_artifacts/markdown_1603668500820/work
 MarkupSafe==1.1.1
 matplotlib @ file:///tmp/build/80754af9/matplotlib-base_1603378225747/work
 mccabe==0.6.1
@@ -113,6 +128,7 @@ mock==4.0.2
 more-itertools @ file:///tmp/build/80754af9/more-itertools_1605111547926/work
 mpmath==1.1.0
 msgpack==1.0.0
+multidict @ file:///home/conda/feedstock_root/build_artifacts/multidict_1602413132207/work
 multipledispatch==0.6.0
 navigator-updater==0.2.1
 nbclient @ file:///tmp/build/80754af9/nbclient_1602783176460/work
@@ -129,8 +145,11 @@ numpy @ file:///tmp/build/80754af9/numpy_and_numpy_base_1603570489231/work
 numpydoc @ file:///tmp/build/80754af9/numpydoc_1605117425582/work
 nvgpu==0.9.0
 nvidia-ml-py3==7.352.0
+oauthlib==3.0.1
 olefile==0.46
+opencv-python==4.4.0.46
 openpyxl @ file:///tmp/build/80754af9/openpyxl_1598113097404/work
+opt-einsum==0+untagged.61.gd905544.dirty
 packaging==20.4
 pandas @ file:///tmp/build/80754af9/pandas_1602088120436/work
 pandocfilters @ file:///tmp/build/80754af9/pandocfilters_1605120460739/work
@@ -149,9 +168,12 @@ pluggy==0.13.1
 ply==3.11
 prometheus-client==0.8.0
 prompt-toolkit @ file:///tmp/build/80754af9/prompt-toolkit_1602688806899/work
+protobuf==3.13.0
 psutil @ file:///tmp/build/80754af9/psutil_1598370257551/work
 ptyprocess==0.6.0
 py @ file:///tmp/build/80754af9/py_1593446248552/work
+pyasn1==0.4.8
+pyasn1-modules==0.2.7
 pycodestyle==2.6.0
 pycosat==0.6.3
 pycparser @ file:///tmp/build/80754af9/pycparser_1594388511720/work
@@ -159,6 +181,7 @@ pycurl==7.43.0.6
 pydocstyle @ file:///tmp/build/80754af9/pydocstyle_1598885001695/work
 pyflakes==2.2.0
 Pygments @ file:///tmp/build/80754af9/pygments_1604103097372/work
+PyJWT==1.7.1
 pylint @ file:///tmp/build/80754af9/pylint_1598623985952/work
 pynvml==8.0.4
 pyodbc===4.0.0-unsupported
@@ -181,7 +204,9 @@ qtconsole @ file:///tmp/build/80754af9/qtconsole_1600870028330/work
 QtPy==1.9.0
 regex @ file:///tmp/build/80754af9/regex_1602786672676/work
 requests @ file:///tmp/build/80754af9/requests_1592841827918/work
+requests-oauthlib @ file:///home/conda/feedstock_root/build_artifacts/requests-oauthlib_1595492159598/work
 rope @ file:///tmp/build/80754af9/rope_1602264064449/work
+rsa @ file:///home/conda/feedstock_root/build_artifacts/rsa_1591996208734/work
 Rtree==0.9.4
 ruamel-yaml==0.15.87
 scikit-image==0.17.2
@@ -214,6 +239,10 @@ sympy @ file:///tmp/build/80754af9/sympy_1605119542615/work
 tables==3.6.1
 tabulate==0.8.7
 tblib @ file:///tmp/build/80754af9/tblib_1597928476713/work
+tensorboard @ file:///home/conda/feedstock_root/build_artifacts/tensorboard_1605165799666/work/tensorboard-2.4.0-py3-none-any.whl
+tensorboard-plugin-wit @ file:///home/conda/feedstock_root/build_artifacts/tensorboard-plugin-wit_1603349307347/work/tensorboard_plugin_wit-1.7.0-py3-none-any.whl
+tensorflow==2.2.0
+tensorflow-estimator @ file:///home/conda/feedstock_root/build_artifacts/tensorflow-estimator_1592819788686/work/tensorflow_estimator-2.2.0-py2.py3-none-any.whl
 termcolor==1.1.0
 terminado==0.9.1
 testpath==0.4.4
@@ -243,6 +272,7 @@ XlsxWriter @ file:///tmp/build/80754af9/xlsxwriter_1602692860603/work
 xlwt==1.3.0
 xmltodict==0.12.0
 yapf @ file:///tmp/build/80754af9/yapf_1593528177422/work
+yarl @ file:///home/conda/feedstock_root/build_artifacts/yarl_1605429457708/work
 zict==2.0.0
 zipp @ file:///tmp/build/80754af9/zipp_1604001098328/work
 zope.event==4.5.0
