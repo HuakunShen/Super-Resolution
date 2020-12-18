@@ -25,6 +25,7 @@ def index():
 def sr():
     image = request.files['image']
     weight = request.files['weight']
+    (current_file_dir / 'data').mkdir(parents=True, exist_ok=True)
     image_path = current_file_dir / 'data' / image.filename
     weight_path = current_file_dir / 'data' / weight.filename
     output_path = current_file_dir / 'data' / 'output.png'
