@@ -14,7 +14,7 @@ We made some modifications to the Original Datasets and generated our own.
 bash setup.sh
 ```
 
-> At least 15GB of space is expected for all datasets.
+> At least 15GB of space is expected for setting up all datasets.
 
 The `setup.sh` uses `wget` to download datasets from a raspberry pi server running at my home, so it might not be very stable. If it doesn't work, you can always use the cloud drive links below to download the datasets and `unzip` them manually.
 
