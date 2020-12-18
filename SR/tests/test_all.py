@@ -14,6 +14,7 @@ from utils.util import get_divider_str
 from model.FSRCNN import FSRCNN, FSRCNN_Original
 from model.SRCNN import SRCNN
 from model.DRRN import DRRN
+from model.resnet_sr import ResNetPretrainedDS, ResNetPretrainedSS
 from model.VDSR import VDSR
 from model.UNetSR import UNetSR, UNetD4, UNetNoTop
 from config import DIV2K_DATASET_PATH

@@ -7,6 +7,7 @@ import torch
 import nvgpu
 import shutil
 import psutil
+from math import log10, sqrt
 import pathlib
 from datetime import timedelta
 from torchvision.transforms import ToTensor
@@ -35,7 +36,7 @@ def psnr(outputs, targets):
     mse = torch.nn.MSELoss()(outputs, targets)
     if mse == 0:
         return torch.tensor(float('inf'))
-    return torch.tensor(20 * math.log10(255.0 / math.sqrt(mse)))
+    return torch.tensor(20 * log10(255.0 / sqrt(mse)))
 
 
 def get_divider_str(msg: str, length: int = 100):
