@@ -38,7 +38,7 @@ if __name__ == '__main__':
         },
         # 'scheduler': None,
         'optimizer': optim.Adam(drrn_img_percep.parameters(), lr=0.002),
-        'set_percentage': 0.9,
+        'train_set_percentage': 0.9,
         'num_worker': multiprocessing.cpu_count(),
         'test_all_multiprocess_cpu': 1,
         'test_only': False
@@ -63,7 +63,7 @@ if __name__ == '__main__':
         },
         # 'scheduler': None,
         'optimizer': optim.Adam(drrn_img_mle.parameters(), lr=0.002),
-        'set_percentage': 0.9,
+        'train_set_percentage': 0.9,
         'num_worker': multiprocessing.cpu_count(),
         'test_all_multiprocess_cpu': 1,
         'test_only': False
@@ -89,7 +89,7 @@ if __name__ == '__main__':
         },
         # 'scheduler': None,
         'optimizer': optim.Adam(drrn_text_percep.parameters(), lr=0.002),
-        'set_percentage': 0.9,
+        'train_set_percentage': 0.9,
         'num_worker': multiprocessing.cpu_count(),
         'test_all_multiprocess_cpu': 1,
         'test_only': False
@@ -117,7 +117,7 @@ if __name__ == '__main__':
         },
         # 'scheduler': None,
         'optimizer': optim.Adam(drrn_text_mle.parameters(), lr=0.002),
-        'set_percentage': 0.9,
+        'train_set_percentage': 0.9,
         'num_worker': multiprocessing.cpu_count(),
         'test_all_multiprocess_cpu': 1,
         'test_only': False
@@ -142,7 +142,7 @@ if __name__ == '__main__':
         },
         # 'scheduler': None,
         'optimizer': optim.Adam(vdsr_img_percep.parameters(), lr=0.002),
-        'set_percentage': 0.9,
+        'train_set_percentage': 0.9,
         'num_worker': multiprocessing.cpu_count(),
         'test_all_multiprocess_cpu': 1,
         'test_only': False
@@ -167,7 +167,7 @@ if __name__ == '__main__':
         },
         # 'scheduler': None,
         'optimizer': optim.Adam(vdsr_img_mle.parameters(), lr=0.002),
-        'set_percentage': 0.9,
+        'train_set_percentage': 0.9,
         'num_worker': multiprocessing.cpu_count(),
         'test_all_multiprocess_cpu': 1,
         'test_only': False
@@ -195,7 +195,7 @@ if __name__ == '__main__':
         },
         # 'scheduler': None,
         'optimizer': optim.Adam(vdsr_text_percep.parameters(), lr=0.002),
-        'set_percentage': 0.9,
+        'train_set_percentage': 0.9,
         'num_worker': multiprocessing.cpu_count(),
         'test_all_multiprocess_cpu': 1,
         'test_only': False
@@ -221,7 +221,7 @@ if __name__ == '__main__':
         },
         # 'scheduler': None,
         'optimizer': optim.Adam(vdsr_text_mle.parameters(), lr=0.002),
-        'set_percentage': 0.9,
+        'train_set_percentage': 0.9,
         'num_worker': multiprocessing.cpu_count(),
         'test_all_multiprocess_cpu': 1,
         'test_only': False
