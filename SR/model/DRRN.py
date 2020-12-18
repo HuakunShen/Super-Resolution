@@ -28,7 +28,7 @@ class DRRN(nn.Module):
                                         padding=1)
 
     def forward(self, x: Tensor):
-        ipt = F.interpolate(x, scale_factor=4, mode = "bicubic")
+        ipt = x
         opt1 = self.conv1(ipt)
         opt1 = F.relu(opt1)
         opt2 = self.conv2(opt1)
