@@ -1,3 +1,7 @@
+"""
+@author: Huakun Shen, Abhishek Thakur
+@reference: https://youtu.be/u1loyDCoGbE
+"""
 import torch
 from torch import nn
 from PIL import Image
