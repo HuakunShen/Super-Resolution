@@ -1,3 +1,7 @@
+"""
+@author: Huakun Shen, yjn870
+@reference: https://github.com/yjn870/FSRCNN-pytorch/blob/master/models.py
+"""
 import math
 from torch import nn
 import torch

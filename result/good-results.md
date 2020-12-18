@@ -42,4 +42,4 @@
 - **unetd4-blur-5-MSE** (OK, a little bit flaw)
 - **unetd4-blur-5-perceptual** (Good, test images have some bad results)
 - **unetd4-blur-7-perceptual** (good)
-
+- **unetd4-blur-7-MSE** (OK, There are still many images with flaws, especially images with pure white background)
