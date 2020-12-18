@@ -11,7 +11,7 @@ class VDSR(nn.Module):
                                kernel_size=(3, 3),
                                stride=2,
                                padding=1)
-        self.conv2 = nn.Conv2d(in_channels=32,
+        self.conv2 = nn.Conv2d(in_channels=64,
                                out_channels=64,
                                kernel_size=(3, 3),
                                stride=2,
