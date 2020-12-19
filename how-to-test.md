@@ -30,7 +30,7 @@ Basically, an experiment contains:
 
 From the above information, you can pick a good experiment and a weight file from it for testing.
 
-## Batch Testing (easier and recommended)
+## Testing Method 1
 
 Batch Testing is enabled by default during the training process. Once training is done, a test directory is created and all test result are saved to it. See [SR Training Framework](./SR) for details.
 
@@ -55,7 +55,9 @@ Note:
 - **checkpoint_dir** has to be set to an existing experiment directory with weights. Suggestion: Download your chosen experiment from our cloud drive.
 - A model needs to be defined just like the training setup (e.g. `model=`), see [model](./SR/model/README.md) for all model definitions.
 
-## Single Image Testing
+## Testing Method 2 (recommended)
+
+[Video Demo](https://youtu.be/oldS47apL7s)
 
 Use the [test.py](./SR/test.py) for testing. 
 
@@ -76,6 +78,8 @@ python test.py --weight model.pth --output test --batch_size 10 --input valid_10
 # Example for single image testing
 python test.py --weight model.pth --output output_file.png --input input_file.png
 ```
+
+[test.py](./SR/test.py) is in [SR](./SR) directory.
 
 For the arguments to the python script, use the correct path.
 

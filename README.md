@@ -1,10 +1,8 @@
 # Super Resolution
 
-This repo will be open to public after Dec. 18th 2020 as that's the due date for this project.
-
 ## Prerequisites
 
-Use [requirements.txt](./requirements.txt) to install all dependencies. (fir anaconda)
+Use [requirements.txt](./requirements.txt) to install all dependencies. (for anaconda)
 
 `pip install -r requirements.txt`
 
@@ -35,11 +33,9 @@ All training can be done within [SR](./SR). Use the template training file [trai
 
 ## How to Test
 
-We prepared 2 types of testing
-- Single Image Testing
-- Batch Testing
+We prepared some scripts for testing. Testing requires you to download weight files from our experiment results. See [Contents](#contents)
 
-Both methods require some data preparation. See [how-to-test.md](./how-to-test.md) for more instructions.
+See [how-to-test.md](./how-to-test.md) for more instructions.
 
 ## Visualizer
 
@@ -52,3 +48,7 @@ See [web](./web/README.md) for more instructions.
 ## Demo
 
 There are some demonstration videos for this project on YouTube, see [playlist](https://www.youtube.com/playlist?list=PLUxw2JoWliip9Cin-sho2xMPRpKqa89Tz).
+
+- [Introduction Video](https://youtu.be/IncGhJ3bBMQ)
+- [Web App Demo](https://youtu.be/lhL6jEjBWXw)
+- [How to Test Demo](https://youtu.be/oldS47apL7s)

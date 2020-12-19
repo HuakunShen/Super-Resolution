@@ -53,7 +53,6 @@ class Trainer(BaseTrainer):
                                           val_L=(
                                               self.valid_loss[-1].item() if len(self.valid_loss) != 0 else None),
                                           lr=get_lr(self.optimizer))
-            #   gpu="{:.0f}%".format(get_gpu_memory_usage_percentage()), mem="{:.0f}%".format(get_memory_usage_percentage()))
             self.memory_profiler.update()
         self.train_loss.append(total_loss / len(self.train_dataloader))
 
@@ -89,14 +88,6 @@ class Trainer(BaseTrainer):
             return total_loss / len(self.valid_dataloader)
 
     def _progress(self, batch_idx):
-        # base = '[{}/{} ({:.0f}%)]'
-        # if hasattr(self.train_dataloader, 'n_samples'):
-        #     current = batch_idx * self.train_dataloader.batch_size
-        #     total = self.train_dataloader.n_samples
-        # else:
-        #     current = batch_idx
-        #     total = self.len_epoch
-        # return base.format(current, total, 100.0 * current / total)
         pass
 
     def _save_checkpoint(self, epoch):

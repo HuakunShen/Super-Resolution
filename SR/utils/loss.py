@@ -43,6 +43,8 @@ def loss_sum(output, target, fe: FeatureExtractor, perceptual_ratio=0.005):
 
 
 class LossSum:
+    """For computing perceptual loss."""
+
     def __init__(self, feature_extractor: FeatureExtractor, perceptual_ratio: float = 0.005):
         self.feature_extractor = feature_extractor
         self.perceptual_ratio = perceptual_ratio
