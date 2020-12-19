@@ -1,5 +1,7 @@
 # Super Resolution
 
+> We recommand either read this project's `README.md`'s on GitHub or with a Markdown viewer.
+
 ## Video Demo
 
 There are some demonstration videos for this project on YouTube, see [playlist](https://www.youtube.com/playlist?list=PLUxw2JoWliip9Cin-sho2xMPRpKqa89Tz).
