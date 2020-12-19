@@ -1,5 +1,13 @@
 # Super Resolution
 
+## Video Demo
+
+There are some demonstration videos for this project on YouTube, see [playlist](https://www.youtube.com/playlist?list=PLUxw2JoWliip9Cin-sho2xMPRpKqa89Tz).
+
+- [Introduction Video](https://youtu.be/IncGhJ3bBMQ)
+- [How to Test Demo](https://youtu.be/oldS47apL7s)
+- [Web App Demo](https://youtu.be/lhL6jEjBWXw)
+
 ## Prerequisites
 
 Use [requirements.txt](./requirements.txt) to install all dependencies. (for anaconda)
@@ -45,10 +53,3 @@ We made a Visualizer Web App for single image Super Resolution.
 
 See [web](./web/README.md) for more instructions.
 
-## Demo
-
-There are some demonstration videos for this project on YouTube, see [playlist](https://www.youtube.com/playlist?list=PLUxw2JoWliip9Cin-sho2xMPRpKqa89Tz).
-
-- [Introduction Video](https://youtu.be/IncGhJ3bBMQ)
-- [Web App Demo](https://youtu.be/lhL6jEjBWXw)
-- [How to Test Demo](https://youtu.be/oldS47apL7s)
