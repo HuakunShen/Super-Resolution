@@ -1,6 +1,8 @@
 # Super Resolution
 
 > We recommand either read this project's `README.md`'s on GitHub or with a Markdown viewer.
+## Report
+[report.pdf](./report.pdf)
 
 ## Video Demo
 
