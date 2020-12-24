@@ -4,6 +4,17 @@
 ## Report
 [report.pdf](./report.pdf)
 
+## Results Demo
+
+![super-res-it](README.assets/super-res-it.gif)
+
+![1949](README.assets/1949.png)
+
+![0](README.assets/0.png)
+
+More experiment results can be found here:
+- [Experiments Results](https://onedrive.live.com/?authkey=%21AFA6I61NVeysBP8&id=7A78FD2CB5D891D5%21161697&cid=7A78FD2CB5D891D5): All experiments results with model weights (more than 30GB in total)
+
 ## Video Demo
 
 There are some demonstration videos for this project on YouTube, see [playlist](https://www.youtube.com/playlist?list=PLUxw2JoWliip9Cin-sho2xMPRpKqa89Tz).
